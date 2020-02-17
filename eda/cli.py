@@ -48,7 +48,7 @@ class CliParser:
     def spectrum(self):
         parser = ArgumentParser(
             description=(
-                f"Plot an absorbance spectrum{os.linesep}"
+                f"Plot an absorbance spectrum. "
                 "You can plot one or several files using -f followed by "
                 "space-separated file names"
             ),
@@ -75,7 +75,7 @@ class CliParser:
     def kinetics(self):
         parser = ArgumentParser(
             description=(
-                f"Plot an absorbance kinetics curve{os.linesep}"
+                "Plot an absorbance kinetics curve. "
                 "You can plot one or several files using -f followed by "
                 "space-separated file names"
             ),

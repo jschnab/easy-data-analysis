@@ -1,12 +1,27 @@
+import logging
 import os
 import sys
 
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from eda.utils import linuxize_newlines, get_number_lines, get_end_of_data
+from eda.utils import (
+    linuxize_newlines,
+    get_number_lines,
+    get_end_of_data,
+    log_errors,
+)
+
+HOME = str(Path.home())
+
+logging.basicConfig(
+    filename=f"{HOME}/eda_errors.log",
+    format="%(asctime)s - %(levelname)s: %(message)s",
+    level=logging.DEBUG,
+)
 
 # CSV file parameters
 WAVELENGTH_COL = "Wavelength (nm)"
@@ -21,6 +36,7 @@ Y_LABEL = "Absorbance (A.U.)"
 LEGEND_LOC = "lower left"
 
 
+@log_errors
 def plot_spectrum(dfs, labels):
     """
     Plot a spectrum from a pandas DataFrame.
@@ -47,6 +63,7 @@ def plot_spectrum(dfs, labels):
     plt.show()
 
 
+@log_errors
 def run(input_files, labels=None):
     """
     Convert CSV files line endings and plot spectra on the same graph.

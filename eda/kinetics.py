@@ -10,7 +10,12 @@ import pandas as pd
 
 from scipy.optimize import curve_fit
 
-from eda.utils import linuxize_newlines, get_number_lines, get_end_of_data
+from eda.utils import (
+    linuxize_newlines,
+    get_number_lines,
+    get_end_of_data,
+    log_errors,
+)
 
 # curve fitting initial parameters
 INIT_PARAMS = [-1, -1, 1]
@@ -31,6 +36,7 @@ Y_LABEL = "Absorbance (A.U.)"
 LEGEND_LOC = "lower right"
 
 
+@log_errors
 def exponential(x, a, k, b):
     """
     Defines a general exponential function.
@@ -38,6 +44,7 @@ def exponential(x, a, k, b):
     return a * np.exp(k * x) + b
 
 
+@log_errors
 def fit_data(x, y, func, initial_parameters=None):
     """
     Fit experimental data with a function.
@@ -55,6 +62,7 @@ def fit_data(x, y, func, initial_parameters=None):
     return popt, perr, fitted
 
 
+@log_errors
 def plot_kinetics(dfs, models=None, labels=None):
     """
     Plot absorbance kinetics from a pandas DataFrame, and overlays
@@ -93,6 +101,7 @@ def plot_kinetics(dfs, models=None, labels=None):
     plt.show()
 
 
+@log_errors
 def run(input_files, labels=None, model=None):
     """
     Convert CSV files line endings and plot absorbance kinetics one the
