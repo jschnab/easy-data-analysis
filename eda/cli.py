@@ -4,19 +4,19 @@ import sys
 
 from argparse import ArgumentParser
 
-from photochemistry import kinetics
-from photochemistry import spectrum
+from eda import kinetics
+from eda import spectrum
 
 
 class CliParser:
     def __init__(self):
         parser = ArgumentParser(
-            description="Photochemistry data analysis tools",
+            description="Tools for easy scientific data analysis",
             usage="pchem <command> <subcommand> [parameters]",
         )
         parser.add_argument(
             "command",
-            help="Command to run. Valid commands are {plot}",
+            help="Valid commands are {plot}",
         )
         args = parser.parse_args(sys.argv[1:2])
         if not hasattr(self, args.command):
@@ -34,7 +34,7 @@ class CliParser:
         parser.add_argument(
             "subcommand",
             help=(
-                "Subcommand to run. Valid subcommands are {spectrum,kinetics}"
+                "Valid subcommands are {spectrum,kinetics}"
             ),
         )
         args = parser.parse_args(sys.argv[2:3])

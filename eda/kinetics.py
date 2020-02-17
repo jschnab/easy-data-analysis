@@ -11,7 +11,7 @@ import pandas as pd
 
 from scipy.optimize import curve_fit
 
-from photochemistry.utils import linuxize_newlines
+from eda.utils import linuxize_newlines
 
 # curve fitting initial parameters
 INIT_PARAMS = [-1, -1, 1]
