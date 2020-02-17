@@ -12,15 +12,15 @@ with open("requirements.txt") as f:
     requirements = [line.strip() for line in f.readlines()]
 
 setup(
-    name="photochemistry",
-    packages=["photochemistry"],
+    name="easy-data-analysis",
+    packages=["eda"],
     entry_points={
-        "console_scripts": ["pchem=photochemistry.cli:main"]
+        "console_scripts": ["eda=eda.cli:main"]
     },
     version=__version__,
-    description="Photochemistry data analysis tools",
+    description="Scientific research data analysis tools",
     long_description=long_description,
-    url="https://github.com/jschnab/photochemistry",
+    url="https://github.com/jschnab/easy-data-analysis",
     author="Jonathan Schnabel",
     author_email="jonathan.schnabel31@gmail.com",
     license="GNU General Public Licence v3.0",
@@ -33,6 +33,6 @@ setup(
         "Programming Language :: Python :: 3.6",
     ],
     python_requires=">=3.6.8",
-    keywords="data analysis photochemistry plotting statistics",
+    keywords="data analysis plotting statistics",
     install_requires=requirements,
 )
