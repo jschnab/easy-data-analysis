@@ -60,9 +60,16 @@ class CliParser:
             nargs="+",
             help="CSV files storing data to plot",
         )
+        parser.add_argument(
+            "-l",
+            "--label",
+            nargs="*",
+            help="Specify the plot legend labels to use for each file",
+        )
         args = parser.parse_args(sys.argv[3:])
         spectrum.run(
             input_files=args.file,
+            labels=args.label,
         )
 
     def kinetics(self):
@@ -86,10 +93,17 @@ class CliParser:
             action="store_true",
             help="Model the data using exponential decay",
         )
+        parser.add_argument(
+            "-l",
+            "--label",
+            nargs="*",
+            help="Specify the plot legend labels to use for each file",
+        )
         args = parser.parse_args(sys.argv[3:])
         kinetics.run(
             input_files=args.file,
             model=args.model,
+            labels=args.label,
         )
 
 

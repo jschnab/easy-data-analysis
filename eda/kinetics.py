@@ -1,6 +1,7 @@
 import os
 import sys
 
+from collections import OrderedDict
 from tempfile import TemporaryDirectory
 
 import matplotlib.pyplot as plt
@@ -82,13 +83,13 @@ def plot_kinetics(dfs, models=None, labels=None):
                 label="Fitted",
                 zorder=0,
             )
-    ax.set_xlim(-0.5, 7.5)
-    ax.set_ylim(0.2, 1.2)
     ax.set_xlabel(X_LABEL, fontsize=16)
     ax.set_ylabel(Y_LABEL, fontsize=16)
     for side in ["top", "right"]:
         ax.spines[side].set_visible(False)
-    plt.legend(loc=LEGEND_LOC)
+    handles, labels = plt.gca().get_legend_handles_labels()
+    by_label = OrderedDict(zip(labels, handles))
+    plt.legend(by_label.values(), by_label.keys(), loc=LEGEND_LOC)
     plt.show()
 
 
@@ -108,6 +109,12 @@ def run(input_files, labels=None, model=None):
             os.path.split(os.path.abspath(infile))[-1]
             for infile in input_files
         ]
+    if len(labels) != len(input_files):
+        print(
+            "Error: there should be as many labels as files, "
+            f"got {len(input_files)} file(s) but {len(labels)} label(s)"
+        )
+        sys.exit(1)
     dfs = []
     models = []
     with TemporaryDirectory() as temp_dir:
