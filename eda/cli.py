@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import sys
 
 from argparse import ArgumentParser
@@ -12,7 +13,7 @@ class CliParser:
     def __init__(self):
         parser = ArgumentParser(
             description="Tools for easy scientific data analysis",
-            usage="pchem <command> <subcommand> [parameters]",
+            usage="eda <command> <subcommand> [parameters]",
         )
         parser.add_argument(
             "command",
@@ -29,7 +30,7 @@ class CliParser:
     def plot(self):
         parser = ArgumentParser(
             description="Draw a plot from data stored in a CSV file",
-            usage="pchem plot <subcommand> [parameters]",
+            usage="eda plot <subcommand> [parameters]",
         )
         parser.add_argument(
             "subcommand",
@@ -46,37 +47,49 @@ class CliParser:
 
     def spectrum(self):
         parser = ArgumentParser(
-            description="Plot an absorbance spectrum",
-            usage="pchem plot spectrum [-h] file",
+            description=(
+                f"Plot an absorbance spectrum{os.linesep}"
+                "You can plot one or several files using -f followed by "
+                "space-separated file names"
+            ),
+            usage="eda plot spectrum [-h] [-f]",
         )
         parser.add_argument(
-            "file",
-            help="CSV file storing data to plot",
+            "-f",
+            "--file",
+            nargs="+",
+            help="CSV files storing data to plot",
         )
         args = parser.parse_args(sys.argv[3:])
         spectrum.run(
-            input_name=args.file,
+            input_files=args.file,
         )
 
     def kinetics(self):
         parser = ArgumentParser(
-            description="Plot an absorbance kinetics curve",
-            usage="pchem plot kinetics [-h] [-f] file",
-        )
-        parser.add_argument(
-            "file",
-            help="CSV file storing data to plot",
+            description=(
+                f"Plot an absorbance kinetics curve{os.linesep}"
+                "You can plot one or several files using -f followed by "
+                "space-separated file names"
+            ),
+            usage="eda plot kinetics [-h] [-f] [-m]",
         )
         parser.add_argument(
             "-f",
-            "--fit",
+            "--file",
+            nargs="+",
+            help="CSV files storing data to plot",
+        )
+        parser.add_argument(
+            "-m",
+            "--model",
             action="store_true",
-            help="Fit the data using exponential decay",
+            help="Model the data using exponential decay",
         )
         args = parser.parse_args(sys.argv[3:])
         kinetics.run(
-            input_name=args.file,
-            fit=args.fit,
+            input_files=args.file,
+            model=args.model,
         )
 
 

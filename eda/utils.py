@@ -14,3 +14,34 @@ def linuxize_newlines(input_name, output_name):
             for line in lines:
                 line = line[:-3] + os.linesep.encode()
                 outfile.write(line)
+
+
+def get_number_lines(path):
+    """
+    Get the number of lines in a file.
+
+    :param str path: path to the file to process
+    :return int: number of line in the file
+    """
+    n = 0
+    with open(path) as f:
+        for line in f:
+            n += 1
+    return n
+
+
+def get_end_of_data(path):
+    """
+    Get the index of the line where data ends in a CSV file.
+    The end of data is defined as the first blank line.
+
+    :param str path: path to the file to process
+    :return int: index of the line where data ends
+    """
+    end_of_data = 0
+    with open(path) as f:
+        for line in f:
+            end_of_data += 1
+            if line.strip() == "":
+                break
+    return end_of_data
