@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
-
 import os
 import sys
 
+from collections import OrderedDict
 from tempfile import TemporaryDirectory
 
 import matplotlib.pyplot as plt
@@ -11,7 +10,12 @@ import pandas as pd
 
 from scipy.optimize import curve_fit
 
-from eda.utils import linuxize_newlines
+from eda.utils import (
+    linuxize_newlines,
+    get_number_lines,
+    get_end_of_data,
+    log_errors,
+)
 
 # curve fitting initial parameters
 INIT_PARAMS = [-1, -1, 1]
@@ -25,11 +29,14 @@ SKIP_FOOTER = 27
 
 # plotting parameters
 EXP_COLOR = "black"
+MARKERS = ["o", "v", "^", "s", "D", "*", "P", "X", "<", ">"]
 FIT_COLOR = "grey"
 X_LABEL = "Time (min)"
 Y_LABEL = "Absorbance (A.U.)"
+LEGEND_LOC = "lower right"
 
 
+@log_errors
 def exponential(x, a, k, b):
     """
     Defines a general exponential function.
@@ -37,6 +44,7 @@ def exponential(x, a, k, b):
     return a * np.exp(k * x) + b
 
 
+@log_errors
 def fit_data(x, y, func, initial_parameters=None):
     """
     Fit experimental data with a function.
@@ -54,87 +62,92 @@ def fit_data(x, y, func, initial_parameters=None):
     return popt, perr, fitted
 
 
-def plot_kinetics(df, fitted=None):
+@log_errors
+def plot_kinetics(dfs, models=None, labels=None):
     """
     Plot absorbance kinetics from a pandas DataFrame, and overlays
     provided fitted data, if provided.
 
-    :param pandas.DataFrame df: contains the data to plot
-    :param array-like fitted: fitted data to overlay
+    :param list[pandas.DataFrame] dfs: list of dataframes containing
+                                       the data to plot
+    :param list[array-like] models: list of fitted data to overlay
+    :param list[str] labels: name of each curve in the plot
     """
     fig, ax = plt.subplots(figsize=(7, 5))
-    ax.scatter(
-        df[TIME_COL],
-        df[ABSORB_COL],
-        c=EXP_COLOR,
-        label="Experimental",
-        zorder=4,
-    )
-    if not fitted.empty:
-        ax.plot(
+    for i, df in enumerate(dfs):
+        ax.scatter(
             df[TIME_COL],
-            fitted,
-            c=FIT_COLOR,
-            label="Fitted",
-            zorder=0,
+            df[ABSORB_COL],
+            c=EXP_COLOR,
+            marker=MARKERS[i],
+            label=labels[i],
+            zorder=4,
         )
-    ax.set_xlim(-0.5, 7.5)
-    ax.set_ylim(0.2, 1.2)
+        if not models[i].empty:
+            ax.plot(
+                df[TIME_COL],
+                models[i],
+                c=FIT_COLOR,
+                label="Fitted",
+                zorder=0,
+            )
     ax.set_xlabel(X_LABEL, fontsize=16)
     ax.set_ylabel(Y_LABEL, fontsize=16)
     for side in ["top", "right"]:
         ax.spines[side].set_visible(False)
-    plt.legend()
+    handles, labels = plt.gca().get_legend_handles_labels()
+    by_label = OrderedDict(zip(labels, handles))
+    plt.legend(by_label.values(), by_label.keys(), loc=LEGEND_LOC)
     plt.show()
 
 
-def run(input_name, fit=None):
-    with TemporaryDirectory() as temp_dir:
-        output_name = os.path.join(temp_dir, "kinetics.csv")
-        linuxize_newlines(input_name, output_name)
-        df = pd.read_csv(
-            output_name,
-            usecols=USE_COLS,
-            engine="python",
-            skiprows=SKIP_HEADER,
-            skipfooter=SKIP_FOOTER,
+@log_errors
+def run(input_files, labels=None, model=None):
+    """
+    Convert CSV files line endings and plot absorbance kinetics one the
+    same graph.
+
+    :param list[str] input_files: list of file paths to process
+    :param list[str] labels: labels of the plot legend, optional
+                             (defaults to file names)
+    :param bool model: whether to model the data and plot the fitted
+                       curve or not, optional
+    """
+    if not labels:
+        labels = [
+            os.path.split(os.path.abspath(infile))[-1]
+            for infile in input_files
+        ]
+    if len(labels) != len(input_files):
+        print(
+            "Error: there should be as many labels as files, "
+            f"got {len(input_files)} file(s) but {len(labels)} label(s)"
         )
-        fitted = pd.Series()
-        if fit:
-            popt, perr, fitted = fit_data(
-                df[TIME_COL],
-                df[ABSORB_COL],
-                exponential,
-                initial_parameters=INIT_PARAMS,
-            )
-        plot_kinetics(df, fitted)
-
-
-def main():
-    if len(sys.argv) < 2:
-        print("Usage:", sys.argv[0], "<file name>")
         sys.exit(1)
-
-    input_name = sys.argv[1]
-
+    dfs = []
+    models = []
     with TemporaryDirectory() as temp_dir:
-        output_name = os.path.join(temp_dir, "kinetics.csv")
-        linuxize_newlines(input_name, output_name)
-        df = pd.read_csv(
-            output_name,
-            usecols=USE_COLS,
-            engine="python",
-            skiprows=SKIP_HEADER,
-            skipfooter=SKIP_FOOTER,
-        )
-        popt, perr, fitted = fit_data(
-            df[TIME_COL],
-            df[ABSORB_COL],
-            exponential,
-            initial_parameters=INIT_PARAMS,
-        )
-        plot_kinetics(df, fitted)
-
-
-if __name__ == "__main__":
-    main()
+        for infile in input_files:
+            output_path = os.path.join(temp_dir, "linuxized.csv")
+            linuxize_newlines(infile, output_path)
+            n_lines = get_number_lines(output_path)
+            end_of_data = get_end_of_data(output_path)
+            skip_footer = n_lines - end_of_data
+            df = pd.read_csv(
+                output_path,
+                usecols=USE_COLS,
+                engine="python",
+                skiprows=SKIP_HEADER,
+                skipfooter=skip_footer,
+            )
+            dfs.append(df)
+            fitted = pd.Series()
+            if model:
+                popt, perr, fitted = fit_data(
+                    df[TIME_COL],
+                    df[ABSORB_COL],
+                    exponential,
+                    initial_parameters=INIT_PARAMS,
+                )
+            models.append(fitted)
+        plot_kinetics(dfs, models, labels)

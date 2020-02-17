@@ -1,7 +1,7 @@
 import os
 from setuptools import setup
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -25,7 +25,7 @@ setup(
     author_email="jonathan.schnabel31@gmail.com",
     license="GNU General Public Licence v3.0",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Natural Language :: English",
