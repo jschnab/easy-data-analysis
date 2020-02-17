@@ -8,7 +8,7 @@ from tempfile import TemporaryDirectory
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from utils import linuxize_newlines
+from photochemistry.utils import linuxize_newlines
 
 # CSV file parameters
 WAVELENGTH_COL = "Wavelength (nm)"
@@ -39,6 +39,21 @@ def plot_spectrum(df):
     for side in ["top", "right"]:
         ax.spines[side].set_visible(False)
     plt.show()
+
+
+def run(input_name):
+    with TemporaryDirectory() as temp_dir:
+        output_name = os.path.join(temp_dir, "spectrum.csv")
+        linuxize_newlines(input_name, output_name)
+        df = pd.read_csv(
+            output_name,
+            usecols=USE_COLS,
+            engine="python",
+            skiprows=SKIP_HEADER,
+            skipfooter=SKIP_FOOTER,
+        )
+        filtered = df[df[WAVELENGTH_COL] > 300]
+        plot_spectrum(filtered)
 
 
 def main():

@@ -11,7 +11,7 @@ import pandas as pd
 
 from scipy.optimize import curve_fit
 
-from utils import linuxize_newlines
+from photochemistry.utils import linuxize_newlines
 
 # curve fitting initial parameters
 INIT_PARAMS = [-1, -1, 1]
@@ -86,6 +86,28 @@ def plot_kinetics(df, fitted=None):
         ax.spines[side].set_visible(False)
     plt.legend()
     plt.show()
+
+
+def run(input_name, fit=None):
+    with TemporaryDirectory() as temp_dir:
+        output_name = os.path.join(temp_dir, "kinetics.csv")
+        linuxize_newlines(input_name, output_name)
+        df = pd.read_csv(
+            output_name,
+            usecols=USE_COLS,
+            engine="python",
+            skiprows=SKIP_HEADER,
+            skipfooter=SKIP_FOOTER,
+        )
+        fitted = pd.Series()
+        if fit:
+            popt, perr, fitted = fit_data(
+                df[TIME_COL],
+                df[ABSORB_COL],
+                exponential,
+                initial_parameters=INIT_PARAMS,
+            )
+        plot_kinetics(df, fitted)
 
 
 def main():
