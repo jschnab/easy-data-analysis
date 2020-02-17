@@ -8,7 +8,7 @@ from tempfile import TemporaryDirectory
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from photochemistry.utils import linuxize_newlines
+from eda.utils import linuxize_newlines
 
 # CSV file parameters
 WAVELENGTH_COL = "Wavelength (nm)"
