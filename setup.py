@@ -1,7 +1,7 @@
 import os
 from setuptools import setup
 
-__version__ = 0.1.0
+__version__ = "0.1.0"
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -15,7 +15,7 @@ setup(
     name="photochemistry",
     packages=["photochemistry"],
     entry_points={
-        "console_scripts": ["photochemistry=photochemistry.main:main"]
+        "console_scripts": ["pchem=photochemistry.cli:main"]
     },
     version=__version__,
     description="Photochemistry data analysis tools",
