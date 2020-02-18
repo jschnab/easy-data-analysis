@@ -1,14 +1,14 @@
 import os
 from setuptools import setup
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 
 here = os.path.abspath(os.path.dirname(__file__))
 
 with open(os.path.join(here, "README.md")) as f:
     long_description = f.read()
 
-with open("requirements.txt") as f:
+with open(os.path.join(here, "requirements.txt")) as f:
     requirements = [line.strip() for line in f.readlines()]
 
 setup(
