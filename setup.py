@@ -1,14 +1,14 @@
 import os
 from setuptools import setup
 
-__version__ = "0.1.2"
+__version__ = "0.1.4"
 
 here = os.path.abspath(os.path.dirname(__file__))
 
 with open(os.path.join(here, "README.md")) as f:
     long_description = f.read()
 
-with open("requirements.txt") as f:
+with open(os.path.join(here, "requirements.txt")) as f:
     requirements = [line.strip() for line in f.readlines()]
 
 setup(
@@ -35,5 +35,10 @@ setup(
     ],
     python_requires=">=3.6.8",
     keywords="data analysis plotting statistics",
-    install_requires=requirements,
+    install_requires=[
+        "matplotlib==3.1.*",
+        "numpy==1.18.*",
+        "pandas==0.25.*",
+        "scipy==1.4.*",
+    ],
 )
