@@ -63,6 +63,22 @@ def fit_data(x, y, func, initial_parameters=None):
 
 
 @log_errors
+def print_params(params, errors, label):
+    """
+    Displays fitted parameters on the console.
+
+    :param tuple[float] params: fitted parameters
+    :param tuple[float] errors: standard error of fitted parameters
+    :param str label: label to identify the data
+    """
+    print(f"Data: {label}")
+    print(f"a    = {params[0]:+.4f} +/- {errors[0]:.4f}")
+    print(f"k    = {params[1]:+.4f} +/- {errors[1]:.4f}")
+    print(f"b    = {params[2]:+.4f} +/- {errors[2]:.4f}")
+    print(f"t1/2 = {np.log(2) / abs(params[1]):.4f} minutes")
+
+
+@log_errors
 def plot_kinetics(dfs, models=None, labels=None):
     """
     Plot absorbance kinetics from a pandas DataFrame, and overlays
@@ -126,8 +142,10 @@ def run(input_files, labels=None, model=None):
         sys.exit(1)
     dfs = []
     models = []
+    if model:
+        print("Fitted equation: absorbance = a * e^(k * time) + b")
     with TemporaryDirectory() as temp_dir:
-        for infile in input_files:
+        for infile, label in zip(input_files, labels):
             output_path = os.path.join(temp_dir, "linuxized.csv")
             linuxize_newlines(infile, output_path)
             n_lines = get_number_lines(output_path)
@@ -149,5 +167,7 @@ def run(input_files, labels=None, model=None):
                     exponential,
                     initial_parameters=INIT_PARAMS,
                 )
+                print()
+                print_params(popt, perr, label)
             models.append(fitted)
         plot_kinetics(dfs, models, labels)

@@ -11,7 +11,7 @@ HOME = str(Path.home())
 logging.basicConfig(
     filename=f"{HOME}/eda_errors.log",
     format="%(asctime)s %(levelname)s %(message)s",
-    level=logging.DEBUG,
+    level=logging.INFO,
 )
 
 
