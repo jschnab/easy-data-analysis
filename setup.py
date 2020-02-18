@@ -1,7 +1,7 @@
 import os
 from setuptools import setup
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -30,6 +30,7 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Natural Language :: English",
         "Operating System :: Unix",
+        "Operating System :: MacOS",
         "Programming Language :: Python :: 3.6",
     ],
     python_requires=">=3.6.8",
