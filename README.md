@@ -2,9 +2,9 @@
 
 ## Overview
 
-This package provides tools to analyze scientific research data, with a focus on plotting and statistical analysis.
+This package provides tools to analyze scientific research data, with a focus on plotting and statistical analysis. It is written in Python and was tested on Linux and MacOS.
 
-## Compatibility and Installation
+## Compatibility
 
 This package is written in Python 3.6 and was tested on Linux and MacOS 13. It depends on the following libraries:
 * matplotlib 3.1.3
@@ -12,7 +12,11 @@ This package is written in Python 3.6 and was tested on Linux and MacOS 13. It d
 * pandas 0.25.3
 * scipy 1.4.1
 
-Installing these libraries is easily done with `pip`, simply run in a terminal:
+## Installation
+
+If you are new to installation of Python and its packages, a [tutorial](https://packaging.python.org/tutorials/installing-packages/) is on the Python's website.
+
+Installing Python libraries is most easily done with `pip`, simply run in a terminal:
 ```
 pip install --upgrade <library>
 ```
@@ -22,20 +26,38 @@ pip install --upgrade <library>
 pip install --upgrade easy-data-analysis
 ```
 
-## Usage
+Source distributions are also available here on GitHub, download the source and install it by running:
+```
+pip install <path>
+```
 
-At the moment `easy-data-analysis` is accessible through a command line interface, type this in your terminal for more information:
+## Command Line Interface
+
+`easy-data-analysis` is accessible through a command line interface which follows this syntax:
+```
+eda <command> <subcommand> [arguments, ...]
+```
+
+Type this in your terminal for more information:
 ```
 eda --help
 ```
 
-Currently, the only available command is `plot` and give access to subommands `spectrum` and `kinetics`.
+### `plot` command
 
-### `spectrum` subcommand
-
-This subcommand plots absorption spectra from CSV files, run:
 ```
-eda plot spectrum [arguments]
+eda plot <subcommand> [arguments, ...]
+```
+
+`plot` reads a CSV file and plots the data according to one of the following subcommands:
+* `spectrum`
+* `kinetics`
+
+#### `spectrum` subcommand
+
+This subcommand plots absorption spectra.
+```
+eda plot spectrum [arguments, ...]
 ```
 
 Arguments include:
@@ -52,11 +74,11 @@ For more information:
 eda plot spectrum -h
 ```
 
-### `kinetics` subcommand
+#### `kinetics` subcommand
 
-This subcommand plots absorption kinetics curves from CSV files, run:
+This subcommand plots absorption kinetics curves. It can also plot an exponential model curve fitted on the data. Parameters of the model will be printed on the console.
 ```
-eda plot kinetics [arguments]
+eda plot kinetics [arguments, ...]
 ```
 
 Arguments include:

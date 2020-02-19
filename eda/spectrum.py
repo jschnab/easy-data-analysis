@@ -30,14 +30,27 @@ USE_COLS = list(range(2))
 SKIP_HEADER = 1
 
 # plotting parameters
+FIG_SIZE = (7, 5)
 COLORS = ["black", "C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"]
 X_LABEL = "Wavelength (nm)"
 Y_LABEL = "Absorbance (A.U.)"
+X_LIM = None
+Y_LIM = None
 LEGEND_LOC = "lower left"
 
 
 @log_errors
-def plot_spectrum(dfs, labels):
+def plot_spectrum(
+    dfs,
+    labels,
+    fig_size,
+    x_col,
+    y_col,
+    x_lab,
+    y_lab,
+    x_lim,
+    y_lim,
+):
     """
     Plot a spectrum from a pandas DataFrame.
     Assumes two columns named 'Wavelength (nm)' and 'Abs'.
@@ -46,17 +59,20 @@ def plot_spectrum(dfs, labels):
                                        data to plot.
     :param list[str] labels: name of each curve in the plot
     """
-    fig, ax = plt.subplots(figsize=(7, 5))
+    fig, ax = plt.subplots(figsize=fig_size)
     for i, df in enumerate(dfs):
         ax.plot(
-            df[WAVELENGTH_COL],
-            df[ABSORB_COL],
+            df[x_col],
+            df[y_col],
             c=COLORS[i],
             label=labels[i],
         )
-    ax.set_xlim(300, 500)
-    ax.set_xlabel(X_LABEL, fontsize=16)
-    ax.set_ylabel(Y_LABEL, fontsize=16)
+    if x_lim:
+        ax.set_xlim(*x_lim)
+    if y_lim:
+        ax.set_ylim(*y_lim)
+    ax.set_xlabel(x_lab, fontsize=16)
+    ax.set_ylabel(y_lab, fontsize=16)
     for side in ["top", "right"]:
         ax.spines[side].set_visible(False)
     plt.legend(loc=LEGEND_LOC)
@@ -64,7 +80,7 @@ def plot_spectrum(dfs, labels):
 
 
 @log_errors
-def run(input_files, labels=None):
+def run(input_files, labels=None, **kwargs):
     """
     Convert CSV files line endings and plot spectra on the same graph.
 
@@ -84,6 +100,7 @@ def run(input_files, labels=None):
         )
         sys.exit(1)
     dfs = []
+    kwargs = {k: v for k, v in kwargs.items() if v is not None}
     with TemporaryDirectory() as temp_dir:
         for infile in input_files:
             output_path = os.path.join(temp_dir, "linuxized.csv")
@@ -95,9 +112,18 @@ def run(input_files, labels=None):
                 output_path,
                 usecols=USE_COLS,
                 engine="python",
-                skiprows=SKIP_HEADER,
+                skiprows=kwargs.get("skip_header", SKIP_HEADER),
                 skipfooter=skip_footer,
             )
-            filtered = df[df[WAVELENGTH_COL] > 300]
-            dfs.append(filtered)
-        plot_spectrum(dfs, labels)
+            dfs.append(df)
+        plot_spectrum(
+            dfs=dfs,
+            labels=labels,
+            fig_size=kwargs.get("fig_size", FIG_SIZE),
+            x_col=kwargs.get("x_col", WAVELENGTH_COL),
+            y_col=kwargs.get("y_col", ABSORB_COL),
+            x_lab=kwargs.get("x_lab", X_LABEL),
+            y_lab=kwargs.get("y_lab", Y_LABEL),
+            x_lim=kwargs.get("x_lim", X_LIM),
+            y_lim=kwargs.get("y_lim", Y_LIM),
+        )
