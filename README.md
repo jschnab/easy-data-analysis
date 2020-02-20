@@ -59,9 +59,7 @@ This subcommand plots absorption spectra.
 ```
 eda plot spectrum [arguments ...]
 ```
-
-Arguments include:
-* `-f` or `--file` specify names of files to process
+File names are positional arguments, they should be passed before optional argument. Optional arguments include:
 * `-l` or `--label` specify labels on data for the plot legend
 * `--figure-size` specify width and height in inches
 * `--xcolumn` name of the column containing x-axis values
@@ -76,7 +74,7 @@ Arguments include:
 
 For example:
 ```
-eda plot spectrum -f file1.csv file2.csv -l experiment1 experiment2
+eda plot spectrum file1.csv file2.csv -l experiment1 experiment2
 ```
 
 For more information:
@@ -91,8 +89,7 @@ This subcommand plots absorption kinetics curves. It can also plot an exponentia
 eda plot kinetics [arguments ...]
 ```
 
-Arguments include:
-* `-f` or `--file` specify names of files to process
+File names are positional arguments and should be passed before optional arguments. Optional arguments include:
 * `-l` or `--label` specify labels on data for the plot legend
 * `-m` or `--model` is a flag indicating an exponential model should be fitted on the data
 * `--figure-size` specify width and height in inches
@@ -108,7 +105,7 @@ Arguments include:
 
 For example:
 ```
-eda plot kinetics -f file1.csv file2.csv -l experiment1 experiment2 -m
+eda plot kinetics file1.csv file2.csv -l experiment1 experiment2 -m
 ```
 
 For more information:
