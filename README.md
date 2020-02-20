@@ -35,7 +35,7 @@ pip install <path>
 
 `easy-data-analysis` is accessible through a command line interface which follows this syntax:
 ```
-eda <command> <subcommand> [arguments, ...]
+eda <command> <subcommand> [arguments ...]
 ```
 
 Type this in your terminal for more information:
@@ -46,7 +46,7 @@ eda --help
 ### `plot` command
 
 ```
-eda plot <subcommand> [arguments, ...]
+eda plot <subcommand> [arguments ...]
 ```
 
 `plot` reads a CSV file and plots the data according to one of the following subcommands:
@@ -57,12 +57,22 @@ eda plot <subcommand> [arguments, ...]
 
 This subcommand plots absorption spectra.
 ```
-eda plot spectrum [arguments, ...]
+eda plot spectrum [arguments ...]
 ```
 
 Arguments include:
 * `-f` or `--file` specify names of files to process
 * `-l` or `--label` specify labels on data for the plot legend
+* `--figure-size` specify width and height in inches
+* `--xcolumn` name of the column containing x-axis values
+* `--ycolumn` name of the column containing y-axis values
+* `--xlabel` label on the plot's x-axis
+* `--ylabel` label on the plot's y-axis
+* `--xlimit` specify left and right values for x-axis limits
+* `--ylimit` specify bottom and top values for y-axis limits
+* `--skip-header` number of rows to skip at the beginning of the file
+* `--legend-location` run `eda plot spectrum -h` for more information
+* `--title` specify the title of the plot
 
 For example:
 ```
@@ -78,13 +88,23 @@ eda plot spectrum -h
 
 This subcommand plots absorption kinetics curves. It can also plot an exponential model curve fitted on the data. Parameters of the model will be printed on the console.
 ```
-eda plot kinetics [arguments, ...]
+eda plot kinetics [arguments ...]
 ```
 
 Arguments include:
 * `-f` or `--file` specify names of files to process
 * `-l` or `--label` specify labels on data for the plot legend
 * `-m` or `--model` is a flag indicating an exponential model should be fitted on the data
+* `--figure-size` specify width and height in inches
+* `--xcolumn` name of the column containing x-axis values
+* `--ycolumn` name of the column containing y-axis values
+* `--xlabel` label on the plot's x-axis
+* `--ylabel` label on the plot's y-axis
+* `--xlimit` specify left and right values for x-axis limits
+* `--ylimit` specify bottom and top values for y-axis limits
+* `--skip-header` number of rows to skip at the beginning of the file
+* `--legend-location` run `eda plot spectrum -h` for more information
+* `--title` specify the title of the plot
 
 For example:
 ```

@@ -16,7 +16,7 @@ class CliParser:
                 "https://github.com/jschnab/easy-data-analysis.git for "
                 "detailed information and a tutorial."
             ),
-            usage="eda <command> <subcommand> [parameters, ...]",
+            usage="eda <command> <subcommand> [parameters ...]",
         )
         parser.add_argument(
             "command",
@@ -33,7 +33,7 @@ class CliParser:
     def plot(self):
         parser = ArgumentParser(
             description="Draw a plot from data stored in a CSV file",
-            usage="eda plot <subcommand> [parameters, ...]",
+            usage="eda plot <subcommand> [parameters ...]",
         )
         parser.add_argument(
             "subcommand",
@@ -51,15 +51,17 @@ class CliParser:
     def spectrum(self):
         parser = ArgumentParser(
             description=(
-                f"Plot an absorbance spectrum. "
-                "You can plot one or several files using -f followed by "
-                "space-separated file names"
+                "Plot an absorbance spectrum. "
+                "For more information: eda plot spectrum -h"
             ),
-            usage="eda plot spectrum [-h] [-f]",
+            usage=(
+                "eda plot spectrum file [file ...] [-h] [-l] [--figure-size] "
+                "[--xcolumn] [--ycolumn] [--xlabel] [--ylabel] [--xlimit] "
+                "[--ylimit] [--skip-header] [--legend-location] [--title]"
+            ),
         )
         parser.add_argument(
-            "-f",
-            "--file",
+            "file",
             nargs="+",
             help="CSV files storing data to plot",
         )
@@ -70,10 +72,11 @@ class CliParser:
             help="Specify the plot legend labels to use for each file",
         )
         parser.add_argument(
-            "--fig-size",
+            "--figure-size",
             nargs=2,
             type=float,
             help="Specify figure size (inches)",
+            dest="fig_size",
         )
         parser.add_argument(
             "--xcolumn",
@@ -117,6 +120,26 @@ class CliParser:
             ),
             dest="skip_header",
         )
+        parser.add_argument(
+            "--legend-location",
+            nargs="?",
+            type=str,
+            help="Specify the position of the legend on the plot",
+            choices=[
+                "best",
+                "upper right",
+                "upper left",
+                "lower right",
+                "lower left",
+            ],
+            dest="legend_loc",
+        )
+        parser.add_argument(
+            "--title",
+            nargs="?",
+            type=str,
+            help="Specify the title of the plot",
+        )
         args = parser.parse_args(sys.argv[3:])
         spectrum.run(
             input_files=args.file,
@@ -129,20 +152,25 @@ class CliParser:
             x_lim=args.xlimit,
             y_lim=args.ylimit,
             skip_header=args.skip_header,
+            legend_loc=args.legend_loc,
+            title=args.title,
         )
 
     def kinetics(self):
         parser = ArgumentParser(
             description=(
                 "Plot an absorbance kinetics curve. "
-                "You can plot one or several files using -f followed by "
-                "space-separated file names"
+                "For more information: eda plot kinetics -h"
             ),
-            usage="eda plot kinetics [-h] [-f] [-m]",
+            usage=(
+                "eda plot spectrum file [file ...] [-h] [-m] [-l] "
+                "[--figure-size] [--xcolumn] [--ycolumn] [--xlabel] [--ylabel]"
+                " [--xlimit] [--ylimit] [--skip-header] [--legend-location] "
+                "[--title]"
+            ),
         )
         parser.add_argument(
-            "-f",
-            "--file",
+            "file",
             nargs="+",
             help="CSV files storing data to plot",
         )
@@ -158,11 +186,90 @@ class CliParser:
             nargs="*",
             help="Specify the plot legend labels to use for each file",
         )
+        parser.add_argument(
+            "--figure-size",
+            nargs=2,
+            type=float,
+            help="Specify figure size (inches)",
+            dest="fig_size",
+        )
+        parser.add_argument(
+            "--xcolumn",
+            nargs="?",
+            help="Specify the name of the column containing x-axis values",
+        )
+        parser.add_argument(
+            "--ycolumn",
+            nargs="?",
+            help="Specify the name of the column containing y-axis values",
+        )
+        parser.add_argument(
+            "--xlabel",
+            nargs="?",
+            help="Specify the label of the plot's x-axis",
+        )
+        parser.add_argument(
+            "--ylabel",
+            nargs="?",
+            help="Specify the label of the plot's y-axis",
+        )
+        parser.add_argument(
+            "--xlimit",
+            nargs=2,
+            type=float,
+            help="Specify the lower and upper limits of the plot's x-axis",
+        )
+        parser.add_argument(
+            "--ylimit",
+            nargs=2,
+            type=float,
+            help="Specify the lower and upper limits of the plot's y-axis",
+        )
+        parser.add_argument(
+            "--skip-header",
+            nargs="?",
+            type=int,
+            help=(
+                "Specify the number of rows to skip at the beginning of the "
+                "CSV file"
+            ),
+            dest="skip_header",
+        )
+        parser.add_argument(
+            "--legend-location",
+            nargs="?",
+            type=str,
+            help="Specify the position of the legend on the plot",
+            choices=[
+                "best",
+                "upper right",
+                "upper left",
+                "lower right",
+                "lower left",
+            ],
+            dest="legend_loc",
+        )
+        parser.add_argument(
+            "--title",
+            nargs="?",
+            type=str,
+            help="Specify the title of the plot",
+        )
         args = parser.parse_args(sys.argv[3:])
         kinetics.run(
             input_files=args.file,
             model=args.model,
             labels=args.label,
+            fig_size=args.fig_size,
+            x_col=args.xcolumn,
+            y_col=args.ycolumn,
+            x_lab=args.xlabel,
+            y_lab=args.ylabel,
+            x_lim=args.xlimit,
+            y_lim=args.ylimit,
+            skip_header=args.skip_header,
+            legend_loc=args.legend_loc,
+            title=args.title,
         )
 
 

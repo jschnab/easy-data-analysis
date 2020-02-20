@@ -50,6 +50,8 @@ def plot_spectrum(
     y_lab,
     x_lim,
     y_lim,
+    legend_loc,
+    title,
 ):
     """
     Plot a spectrum from a pandas DataFrame.
@@ -75,12 +77,13 @@ def plot_spectrum(
     ax.set_ylabel(y_lab, fontsize=16)
     for side in ["top", "right"]:
         ax.spines[side].set_visible(False)
-    plt.legend(loc=LEGEND_LOC)
+    ax.set_title(title)
+    plt.legend(loc=legend_loc)
     plt.show()
 
 
 @log_errors
-def run(input_files, labels=None, **kwargs):
+def run(input_files, **kwargs):
     """
     Convert CSV files line endings and plot spectra on the same graph.
 
@@ -88,19 +91,20 @@ def run(input_files, labels=None, **kwargs):
     :param list[str] labels: labels of the plot legend, optional (defaults
                              to file names
     """
-    if not labels:
-        labels = [
+    kwargs = {k: v for k, v in kwargs.items() if v is not None}
+    if not kwargs.get("labels"):
+        kwargs["labels"] = [
             os.path.split(os.path.abspath(infile))[-1]
             for infile in input_files
         ]
-    if len(labels) != len(input_files):
+    if len(kwargs["labels"]) != len(input_files):
         print(
             "Error: there should be as many labels as files, "
-            f"got {len(input_files)} file(s) but {len(labels)} label(s)"
+            f"got {len(input_files)} file(s) but {len(kwargs['labels'])} "
+            "label(s)"
         )
         sys.exit(1)
     dfs = []
-    kwargs = {k: v for k, v in kwargs.items() if v is not None}
     with TemporaryDirectory() as temp_dir:
         for infile in input_files:
             output_path = os.path.join(temp_dir, "linuxized.csv")
@@ -118,7 +122,7 @@ def run(input_files, labels=None, **kwargs):
             dfs.append(df)
         plot_spectrum(
             dfs=dfs,
-            labels=labels,
+            labels=kwargs["labels"],
             fig_size=kwargs.get("fig_size", FIG_SIZE),
             x_col=kwargs.get("x_col", WAVELENGTH_COL),
             y_col=kwargs.get("y_col", ABSORB_COL),
@@ -126,4 +130,6 @@ def run(input_files, labels=None, **kwargs):
             y_lab=kwargs.get("y_lab", Y_LABEL),
             x_lim=kwargs.get("x_lim", X_LIM),
             y_lim=kwargs.get("y_lim", Y_LIM),
+            legend_loc=kwargs.get("legend_loc", LEGEND_LOC),
+            title=kwargs.get("title"),
         )
