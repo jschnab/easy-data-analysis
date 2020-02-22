@@ -15,7 +15,7 @@ from eda.utils import (
     get_end_of_data,
     get_linesep,
     get_number_lines,
-    linuxize_newlines,
+    format_newlines,
     log_errors,
 )
 
@@ -171,9 +171,9 @@ def run(input_files, **kwargs):
         print("Model equation: absorbance = a * e^(k * time) + b")
     with TemporaryDirectory() as temp_dir:
         for infile, label in zip(input_files, kwargs["labels"]):
-            output_path = os.path.join(temp_dir, "linuxized.csv")
+            output_path = os.path.join(temp_dir, "formatted.csv")
             linesep = get_linesep(infile)
-            linuxize_newlines(infile, len(linesep), output_path)
+            format_newlines(infile, len(linesep), output_path)
             n_lines = get_number_lines(output_path)
             end_of_data = get_end_of_data(output_path)
             skip_footer = n_lines - end_of_data

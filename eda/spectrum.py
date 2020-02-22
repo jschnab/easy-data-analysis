@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from eda.utils import (
-    linuxize_newlines,
+    format_newlines,
     get_linesep,
     get_end_of_data,
     get_number_lines,
@@ -113,9 +113,9 @@ def run(input_files, **kwargs):
     dfs = []
     with TemporaryDirectory() as temp_dir:
         for infile in input_files:
-            output_path = os.path.join(temp_dir, "linuxized.csv")
+            output_path = os.path.join(temp_dir, "formatted.csv")
             linesep = get_linesep(infile)
-            linuxize_newlines(infile, len(linesep), output_path)
+            format_newlines(infile, len(linesep), output_path)
             n_lines = get_number_lines(output_path)
             end_of_data = get_end_of_data(output_path)
             skip_footer = n_lines - end_of_data

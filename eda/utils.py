@@ -1,15 +1,13 @@
 import functools
 import logging
-import os
 import sys
 import traceback
 
+from os import linesep
 from pathlib import Path
 
-HOME = str(Path.home())
-
 logging.basicConfig(
-    filename=f"{HOME}/eda_errors.log",
+    filename=f"{str(Path.home())}/.edalog",
     format="%(asctime)s %(levelname)s %(message)s",
     level=logging.INFO,
 )
@@ -53,7 +51,7 @@ def get_linesep(input_name):
 
 
 @log_errors
-def linuxize_newlines(input_name, len_linesep, output_name):
+def format_newlines(input_name, len_linesep, output_name):
     """
     Makes a copy of a file and ensure Unix newline characters.
 
@@ -64,7 +62,7 @@ def linuxize_newlines(input_name, len_linesep, output_name):
         lines = infile.readlines()
         with open(output_name, "wb") as outfile:
             for line in lines:
-                line = line[:-len_linesep] + os.linesep.encode()
+                line = line[:-len_linesep] + linesep.encode()
                 outfile.write(line)
 
 

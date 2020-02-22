@@ -33,12 +33,17 @@ class CliParser:
 
     def configure(self):
         parser = ArgumentParser(
-            description="Configure parameters",
+            description=("Configure default parameters"),
             usage="eda configure <subcommand>",
         )
         parser.add_argument(
             "subcommand",
-            help=("Valid subcommands are {kinetics,spectrum}"),
+            help=(
+                "Valid subcommands are {default,kinetics,spectrum}. Use "
+                "'default' to rollback to default configuration, 'kinetics' "
+                "or 'spectrum' to configure corresponding 'eda plot' "
+                "subcommands."
+            ),
         )
         args = parser.parse_args(sys.argv[2:3])
         config = ConfigurationManager()

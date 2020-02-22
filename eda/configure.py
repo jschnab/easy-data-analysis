@@ -1,5 +1,8 @@
-import os
 import yaml
+
+from os import path as ospath
+from pathlib import Path
+from shutil import copyfile
 
 
 transform_input = {
@@ -20,9 +23,12 @@ transform_input = {
 
 class ConfigurationManager:
     def __init__(self):
-        here = os.path.abspath(os.path.dirname(__file__))
-        self.config_file = os.path.join(here, "config.yaml")
-        self.config_default = os.path.join(here, "config_default.yaml")
+        here = ospath.abspath(ospath.dirname(__file__))
+        home = str(Path.home())
+        self.config_user = ospath.join(home, ".edaconf")
+        self.config_default = ospath.join(here, "config_default.yaml")
+        if not ospath.exists(self.config_user):
+            copyfile(self.config_default, self.config_user)
 
     def print_info(self):
         print()
@@ -41,7 +47,7 @@ class ConfigurationManager:
 
     def record(self, subcommand):
         self.print_info()
-        with open(self.config_file) as f:
+        with open(self.config_user) as f:
             config = yaml.load(f, Loader=yaml.FullLoader)
         inputs = {}
         for key, value in config["plot"][subcommand].items():
@@ -65,7 +71,7 @@ class ConfigurationManager:
                 inputs[key] = trans
                 break
         config["plot"][subcommand] = inputs
-        with open(self.config_file, "w") as f:
+        with open(self.config_user, "w") as f:
             yaml.dump(config, f, default_flow_style=False)
 
     def spectrum(self, subcommand):
@@ -77,6 +83,6 @@ class ConfigurationManager:
     def default(self, *args):
         with open(self.config_default) as f:
             config = yaml.load(f, Loader=yaml.FullLoader)
-        with open(self.config_file, "w") as f:
+        with open(self.config_user, "w") as f:
             yaml.dump(config, f, default_flow_style=False)
         print("Rolled back to default configuration")
