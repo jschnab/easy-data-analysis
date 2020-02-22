@@ -1,15 +1,12 @@
 import os
 from setuptools import setup
 
-__version__ = "0.1.4"
+__version__ = "0.2.1"
 
 here = os.path.abspath(os.path.dirname(__file__))
 
 with open(os.path.join(here, "README.md")) as f:
     long_description = f.read()
-
-with open(os.path.join(here, "requirements.txt")) as f:
-    requirements = [line.strip() for line in f.readlines()]
 
 setup(
     name="easy-data-analysis",
