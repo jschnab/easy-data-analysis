@@ -43,6 +43,24 @@ Type this in your terminal for more information:
 eda --help
 ```
 
+### `configure` command
+
+```
+eda configure <subcommand>
+```
+
+`configure` manages the default arguments of all commands, i.e. the behaviour of commands when you do not provide optional arguments.
+Available subcommands:
+* `spectrum`: configure `eda plot spectrum`
+* `kinetics`: configure `eda plot kinetics`
+* `default`: rollback to the original configuration (the one provided when you install this package)
+
+When you enter the configuration mode, instructions will be displayed before you are prompted for input. The name of the parameter is displayed followed by its current value between ( parentheses ).
+You have three possible actions (validate any of them by pressing <Enter>):
+* keep the current value: leave the input field empty
+* modify the current value: type your input (if a list is expected, use space to separate values)
+* enter a void value (no value): enter 'none' (without quotes)
+
 ### `plot` command
 
 ```

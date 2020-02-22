@@ -30,7 +30,30 @@ def log_errors(func):
 
 
 @log_errors
-def linuxize_newlines(input_name, output_name):
+def get_linesep(input_name):
+    """
+    Identifies the line separator and returns it.
+    Possibilities are : \n, \r\n, \r and \r\r\n
+
+    :param str input_name: name of the file to process
+    :return str: line separator
+    """
+    with open(input_name, "rb") as infile:
+        line = infile.readline()
+        if line[-3:] == b"\r\r\n":
+            return "\r\r\n"
+        elif line[-2:] == b"\r\n":
+            return "\r\n"
+        elif line[-1:] == b"\r":
+            return "\r"
+        elif line[-1:] == b"\n":
+            return "\n"
+        else:
+            raise ValueError("Could not identify line separator")
+
+
+@log_errors
+def linuxize_newlines(input_name, len_linesep, output_name):
     """
     Makes a copy of a file and ensure Unix newline characters.
 
@@ -41,7 +64,7 @@ def linuxize_newlines(input_name, output_name):
         lines = infile.readlines()
         with open(output_name, "wb") as outfile:
             for line in lines:
-                line = line[:-3] + os.linesep.encode()
+                line = line[:-len_linesep] + os.linesep.encode()
                 outfile.write(line)
 
 

@@ -1,0 +1,27 @@
+plot:
+    spectrum:
+        use_cols: [0, 1]
+        figure_size: [7, 5]
+        xcolumn: "Wavelength (nm)"
+        ycolumn: "Abs"
+        xlabel: "Wavelength (nm)"
+        ylabel: "Absorbance (A.U.)"
+        xlimit: [300, 500]
+        ylimit:
+        skip_header: 1
+        legend_location: "upper left"
+        title:
+    kinetics:
+        model: True 
+        use_cols: [0, 1]
+        figure_size: [7, 5]
+        xcolumn: "Time (min)"
+        ycolumn: "Abs"
+        xlabel: "Time (min)"
+        ylabel: "Absorbance (A.U.)"
+        xlimit:
+        ylimit:
+        skip_header: 1
+        legend_location: "lower right"
+        title:
+

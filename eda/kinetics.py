@@ -1,5 +1,6 @@
 import os
 import sys
+import yaml
 
 from collections import OrderedDict
 from tempfile import TemporaryDirectory
@@ -11,14 +12,12 @@ import pandas as pd
 from scipy.optimize import curve_fit
 
 from eda.utils import (
-    linuxize_newlines,
-    get_number_lines,
     get_end_of_data,
+    get_linesep,
+    get_number_lines,
+    linuxize_newlines,
     log_errors,
 )
-
-# curve fitting initial parameters
-INIT_PARAMS = [-1, -1, 1]
 
 # CSV file parameters
 TIME_COL = "Time (min)"
@@ -40,9 +39,9 @@ LEGEND_LOC = "lower right"
 @log_errors
 def exponential(x, a, k, b):
     """
-    Defines a general exponential function.
+    Defines a negative exponential function (k < 0).
     """
-    return a * np.exp(k * x) + b
+    return a * np.exp(-k * x) + b
 
 
 @log_errors
@@ -129,7 +128,7 @@ def plot_kinetics(
     ax.set_ylabel(y_lab, fontsize=16)
     for side in ["top", "right"]:
         ax.spines[side].set_visible(False)
-    ax.set_title(title)
+    ax.set_title(title, fontsize=18)
     # remove duplicated legend
     handles, labels = plt.gca().get_legend_handles_labels()
     by_label = OrderedDict(zip(labels, handles))
@@ -149,6 +148,10 @@ def run(input_files, **kwargs):
     :param bool model: whether to model the data and plot the fitted
                        curve or not, optional
     """
+    here = os.path.abspath(os.path.dirname(__file__))
+    config_file = os.path.join(here, "config.yaml")
+    with open(config_file) as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)["plot"]["kinetics"]
     kwargs = {k: v for k, v in kwargs.items() if v is not None}
     if not kwargs.get("labels"):
         kwargs["labels"] = [
@@ -164,12 +167,13 @@ def run(input_files, **kwargs):
         sys.exit(1)
     dfs = []
     models = []
-    if kwargs.get("model"):
+    if kwargs.get("model") or config["model"]:
         print("Model equation: absorbance = a * e^(k * time) + b")
     with TemporaryDirectory() as temp_dir:
         for infile, label in zip(input_files, kwargs["labels"]):
             output_path = os.path.join(temp_dir, "linuxized.csv")
-            linuxize_newlines(infile, output_path)
+            linesep = get_linesep(infile)
+            linuxize_newlines(infile, len(linesep), output_path)
             n_lines = get_number_lines(output_path)
             end_of_data = get_end_of_data(output_path)
             skip_footer = n_lines - end_of_data
@@ -177,17 +181,16 @@ def run(input_files, **kwargs):
                 output_path,
                 usecols=USE_COLS,
                 engine="python",
-                skiprows=kwargs.get("skip_header", SKIP_HEADER),
+                skiprows=kwargs.get("skip_header", config["skip_header"]),
                 skipfooter=skip_footer,
             )
             dfs.append(df)
             fitted = pd.Series()
-            if kwargs.get("model"):
+            if kwargs.get("model") or config["model"]:
                 popt, perr, fitted = fit_data(
-                    df[kwargs.get("x_col", TIME_COL)],
-                    df[kwargs.get("y_col", ABSORB_COL)],
+                    df[kwargs.get("x_col", config["xcolumn"])],
+                    df[kwargs.get("y_col", config["ycolumn"])],
                     exponential,
-                    initial_parameters=INIT_PARAMS,
                 )
                 print()
                 print_params(popt, perr, label)
@@ -196,13 +199,13 @@ def run(input_files, **kwargs):
             dfs,
             models,
             kwargs["labels"],
-            fig_size=kwargs.get("fig_size", FIG_SIZE),
-            x_col=kwargs.get("x_col", TIME_COL),
-            y_col=kwargs.get("y_col", ABSORB_COL),
-            x_lab=kwargs.get("x_lab", X_LABEL),
-            y_lab=kwargs.get("y_lab", Y_LABEL),
-            x_lim=kwargs.get("x_lim"),
-            y_lim=kwargs.get("y_lim"),
-            legend_loc=kwargs.get("legend_loc", LEGEND_LOC),
+            fig_size=kwargs.get("fig_size", config["figure_size"]),
+            x_col=kwargs.get("x_col", config["xcolumn"]),
+            y_col=kwargs.get("y_col", config["ycolumn"]),
+            x_lab=kwargs.get("x_lab", config["xlabel"]),
+            y_lab=kwargs.get("y_lab", config["ylabel"]),
+            x_lim=kwargs.get("x_lim", config["xlimit"]),
+            y_lim=kwargs.get("y_lim", config["ylimit"]),
+            legend_loc=kwargs.get("legend_loc", config["legend_location"]),
             title=kwargs.get("title"),
         )

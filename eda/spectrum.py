@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import yaml
 
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -10,8 +11,9 @@ import pandas as pd
 
 from eda.utils import (
     linuxize_newlines,
-    get_number_lines,
+    get_linesep,
     get_end_of_data,
+    get_number_lines,
     log_errors,
 )
 
@@ -77,7 +79,7 @@ def plot_spectrum(
     ax.set_ylabel(y_lab, fontsize=16)
     for side in ["top", "right"]:
         ax.spines[side].set_visible(False)
-    ax.set_title(title)
+    ax.set_title(title, fontsize=18)
     plt.legend(loc=legend_loc)
     plt.show()
 
@@ -91,6 +93,10 @@ def run(input_files, **kwargs):
     :param list[str] labels: labels of the plot legend, optional (defaults
                              to file names
     """
+    here = os.path.abspath(os.path.dirname(__file__))
+    config_file = os.path.join(here, "config.yaml")
+    with open(config_file) as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)["plot"]["spectrum"]
     kwargs = {k: v for k, v in kwargs.items() if v is not None}
     if not kwargs.get("labels"):
         kwargs["labels"] = [
@@ -108,28 +114,29 @@ def run(input_files, **kwargs):
     with TemporaryDirectory() as temp_dir:
         for infile in input_files:
             output_path = os.path.join(temp_dir, "linuxized.csv")
-            linuxize_newlines(infile, output_path)
+            linesep = get_linesep(infile)
+            linuxize_newlines(infile, len(linesep), output_path)
             n_lines = get_number_lines(output_path)
             end_of_data = get_end_of_data(output_path)
             skip_footer = n_lines - end_of_data
             df = pd.read_csv(
                 output_path,
-                usecols=USE_COLS,
+                usecols=kwargs.get("use_cols", config["use_cols"]),
                 engine="python",
-                skiprows=kwargs.get("skip_header", SKIP_HEADER),
+                skiprows=kwargs.get("skip_header", config["skip_header"]),
                 skipfooter=skip_footer,
             )
             dfs.append(df)
         plot_spectrum(
             dfs=dfs,
             labels=kwargs["labels"],
-            fig_size=kwargs.get("fig_size", FIG_SIZE),
-            x_col=kwargs.get("x_col", WAVELENGTH_COL),
-            y_col=kwargs.get("y_col", ABSORB_COL),
-            x_lab=kwargs.get("x_lab", X_LABEL),
-            y_lab=kwargs.get("y_lab", Y_LABEL),
-            x_lim=kwargs.get("x_lim", X_LIM),
-            y_lim=kwargs.get("y_lim", Y_LIM),
-            legend_loc=kwargs.get("legend_loc", LEGEND_LOC),
-            title=kwargs.get("title"),
+            fig_size=kwargs.get("fig_size", config["figure_size"]),
+            x_col=kwargs.get("x_col", config["xcolumn"]),
+            y_col=kwargs.get("y_col", config["ycolumn"]),
+            x_lab=kwargs.get("x_lab", config["xlabel"]),
+            y_lab=kwargs.get("y_lab", config["ylabel"]),
+            x_lim=kwargs.get("x_lim", config["xlimit"]),
+            y_lim=kwargs.get("y_lim", config["ylimit"]),
+            legend_loc=kwargs.get("legend_loc", config["legend_location"]),
+            title=kwargs.get("title", config["title"]),
         )

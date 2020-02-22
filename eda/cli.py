@@ -6,6 +6,7 @@ from argparse import ArgumentParser
 
 from eda import kinetics
 from eda import spectrum
+from eda.configure import ConfigurationManager
 
 
 class CliParser:
@@ -20,7 +21,7 @@ class CliParser:
         )
         parser.add_argument(
             "command",
-            help="Valid commands are {plot}",
+            help="Valid commands are {configure,plot}",
         )
         args = parser.parse_args(sys.argv[1:2])
         if not hasattr(self, args.command):
@@ -30,6 +31,23 @@ class CliParser:
         # use dispatch pattern to invoke command with same name
         getattr(self, args.command)()
 
+    def configure(self):
+        parser = ArgumentParser(
+            description="Configure parameters",
+            usage="eda configure <subcommand>",
+        )
+        parser.add_argument(
+            "subcommand",
+            help=("Valid subcommands are {kinetics,spectrum}"),
+        )
+        args = parser.parse_args(sys.argv[2:3])
+        config = ConfigurationManager()
+        if not hasattr(config, args.subcommand):
+            print(f"unrecognized subcommand '{args.subcommand}'")
+            parser.print_help()
+            sys.exit(1)
+        getattr(config, args.subcommand)(args.subcommand)
+
     def plot(self):
         parser = ArgumentParser(
             description="Draw a plot from data stored in a CSV file",
@@ -37,9 +55,7 @@ class CliParser:
         )
         parser.add_argument(
             "subcommand",
-            help=(
-                "Valid subcommands are {spectrum,kinetics}"
-            ),
+            help=("Valid subcommands are {kinetics,spectrum}"),
         )
         args = parser.parse_args(sys.argv[2:3])
         if not hasattr(self, args.subcommand):
