@@ -1,11 +1,11 @@
 import os
 from setuptools import setup
 
-__version__ = "0.2.1"
+__version__ = "0.2.3"
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(here, "README.md")) as f:
+with open(os.path.join(here, "pypi_description.rst")) as f:
     long_description = f.read()
 
 setup(
