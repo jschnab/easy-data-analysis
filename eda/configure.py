@@ -14,6 +14,7 @@ transform_input = {
     "skip_header": lambda x: int(x),
     "legend_location": lambda x: x,
     "title": lambda x: x,
+    "model": lambda x: True if x.lower() == 'true' else False,
 }
 
 
@@ -74,8 +75,8 @@ class ConfigurationManager:
         self.record(subcommand)
 
     def default(self, *args):
-        print("Rolling back to default configuration")
         with open(self.config_default) as f:
             config = yaml.load(f, Loader=yaml.FullLoader)
         with open(self.config_file, "w") as f:
             yaml.dump(config, f, default_flow_style=False)
+        print("Rolled back to default configuration")
