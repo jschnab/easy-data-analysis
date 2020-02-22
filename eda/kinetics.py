@@ -1,8 +1,10 @@
-import os
+import logging
 import sys
 import yaml
 
 from collections import OrderedDict
+from os import path as ospath
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import matplotlib.pyplot as plt
@@ -17,6 +19,12 @@ from eda.utils import (
     get_number_lines,
     format_newlines,
     log_errors,
+)
+
+logging.basicConfig(
+    filename=f"{str(Path.home())}/.edalog",
+    format="%(asctime)s - %(levelname)s: %(message)s",
+    level=logging.DEBUG,
 )
 
 # CSV file parameters
@@ -148,14 +156,13 @@ def run(input_files, **kwargs):
     :param bool model: whether to model the data and plot the fitted
                        curve or not, optional
     """
-    here = os.path.abspath(os.path.dirname(__file__))
-    config_file = os.path.join(here, "config.yaml")
+    config_file = ospath.join(str(Path.home()), ".edaconf")
     with open(config_file) as f:
         config = yaml.load(f, Loader=yaml.FullLoader)["plot"]["kinetics"]
     kwargs = {k: v for k, v in kwargs.items() if v is not None}
     if not kwargs.get("labels"):
         kwargs["labels"] = [
-            os.path.split(os.path.abspath(infile))[-1]
+            ospath.split(ospath.abspath(infile))[-1]
             for infile in input_files
         ]
     if len(kwargs["labels"]) != len(input_files):
@@ -171,7 +178,7 @@ def run(input_files, **kwargs):
         print("Model equation: absorbance = a * e^(k * time) + b")
     with TemporaryDirectory() as temp_dir:
         for infile, label in zip(input_files, kwargs["labels"]):
-            output_path = os.path.join(temp_dir, "formatted.csv")
+            output_path = ospath.join(temp_dir, "formatted.csv")
             linesep = get_linesep(infile)
             format_newlines(infile, len(linesep), output_path)
             n_lines = get_number_lines(output_path)

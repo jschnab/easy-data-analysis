@@ -33,7 +33,7 @@ class ConfigurationManager:
     def print_info(self):
         print()
         print(f"Configuration instructions")
-        print("------------")
+        print("--------------------------")
         print("The current value is displayed between ( parentheses ).")
         print("The absence of value is indicated by 'None'.")
         print("Validate your choice by pressing <Enter>.")
