@@ -1,7 +1,7 @@
 import os
 from setuptools import setup
 
-__version__ = "0.2.3"
+__version__ = "0.2.4"
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -37,5 +37,6 @@ setup(
         "numpy==1.18.*",
         "pandas==0.25.*",
         "scipy==1.4.*",
+        "pyyaml==5.3.*",
     ],
 )
