@@ -1,7 +1,7 @@
 import os
 from setuptools import setup
 
-__version__ = "0.2.5"
+__version__ = "0.2.6"
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -12,7 +12,7 @@ setup(
     name="easy-data-analysis",
     packages=["eda"],
     package_data={
-        "": ["pypi_description.rst"],
+        "": ["*.rst", "*.yaml"],
     },
     entry_points={
         "console_scripts": ["eda=eda.cli:main"]
