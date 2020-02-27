@@ -3,6 +3,9 @@
 import sys
 
 from argparse import ArgumentParser
+from os import path as ospath
+from pathlib import Path
+from shutil import copyfile
 
 from eda import kinetics
 from eda import spectrum
@@ -28,6 +31,13 @@ class CliParser:
             print(f"unrecognized command '{args.command}'")
             parser.print_help()
             sys.exit(1)
+        # create the configuration file if it does not exist
+        home = str(Path.home())
+        self.config_user = ospath.join(home, ".edaconf")
+        if not ospath.exists(self.config_user):
+            here = ospath.abspath(ospath.dirname(__file__))
+            self.config_default = ospath.join(here, "config_default.yaml")
+            copyfile(self.config_default, self.config_user)
         # use dispatch pattern to invoke command with same name
         getattr(self, args.command)()
 

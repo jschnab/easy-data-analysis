@@ -16,19 +16,19 @@ This package is written in Python 3.6 and was tested on Linux and MacOS 13. It d
 
 If you are new to installation of Python and its packages, a [tutorial](https://packaging.python.org/tutorials/installing-packages/) is on the Python's website.
 
-Installing Python libraries is most easily done with `pip`, simply run in a terminal:
+Installing Python libraries is most easily done with `pip3`, simply run in a terminal:
 ```
-pip install --upgrade <library>
+pip3 install --upgrade <library>
 ```
 
 `easy-data-analysis` is packaged and available through [PyPI](https://pypi.org), you can install it by running in a terminal:
 ```
-pip install --upgrade easy-data-analysis
+pip3 install --upgrade easy-data-analysis
 ```
 
 Source distributions are also available here on GitHub, download the source and install it by running:
 ```
-pip install <path>
+pip3 install <path>
 ```
 
 ## Command Line Interface

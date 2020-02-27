@@ -1,16 +1,19 @@
 import os
 from setuptools import setup
 
-__version__ = "0.2.4"
+__version__ = "0.2.8"
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(here, "pypi_description.rst")) as f:
+with open(os.path.join(here, "eda", "docs", "pypi_description.rst")) as f:
     long_description = f.read()
 
 setup(
     name="easy-data-analysis",
     packages=["eda"],
+    package_data={
+        "eda": ["*.yaml", "docs/*"],
+    },
     entry_points={
         "console_scripts": ["eda=eda.cli:main"]
     },
