@@ -28,6 +28,21 @@ def log_errors(func):
 
 
 @log_errors
+def send_warnings_to_log(
+    message,
+    category,
+    filename,
+    lineno,
+    file=None,
+    line=None
+):
+    """
+    Function to log warnings instead of printing them on the console.
+    """
+    logging.warning(message)
+
+
+@log_errors
 def get_linesep(input_name):
     """
     Identifies the line separator and returns it.

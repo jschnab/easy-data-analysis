@@ -17,7 +17,8 @@ transform_input = {
     "skip_header": lambda x: int(x),
     "legend_location": lambda x: x,
     "title": lambda x: x,
-    "model": lambda x: True if x.lower() == 'true' else False,
+    "fit": lambda x: True if x.lower() == 'true' else False,
+    "model": lambda x: x,
 }
 
 

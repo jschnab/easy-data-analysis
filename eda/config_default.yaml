@@ -12,7 +12,8 @@ plot:
         legend_location: "upper left"
         title:
     kinetics:
-        model: True 
+        fit: True 
+        model: "exponential"
         use_cols: [0, 1]
         figure_size: [7, 5]
         xcolumn: "Time (min)"

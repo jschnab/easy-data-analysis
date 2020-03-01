@@ -194,7 +194,7 @@ class CliParser:
                 "For more information: eda plot kinetics -h"
             ),
             usage=(
-                "eda plot spectrum file [file ...] [-h] [-m] [-l] "
+                "eda plot spectrum file [file ...] [-h] [-f] [-m] [-l] "
                 "[--figure-size] [--xcolumn] [--ycolumn] [--xlabel] [--ylabel]"
                 " [--xlimit] [--ylimit] [--skip-header] [--legend-location] "
                 "[--title]"
@@ -206,10 +206,23 @@ class CliParser:
             help="CSV files storing data to plot",
         )
         parser.add_argument(
+            "-f",
+            "--fit",
+            action="store_true",
+            help=(
+                "Fit the data using a model (first-order exponential decay by "
+                "defaut, specify model with '-f' or '--fit' argument)"
+            ),
+        )
+        parser.add_argument(
             "-m",
             "--model",
-            action="store_true",
-            help="Model the data using exponential decay",
+            choices=["exponential"],
+            default="exponential",
+            help=(
+                "Specify the model to use when fitting data (default is "
+                "exponential)"
+            ),
         )
         parser.add_argument(
             "-l",
@@ -289,6 +302,7 @@ class CliParser:
         args = parser.parse_args(sys.argv[3:])
         kinetics.run(
             input_files=args.file,
+            fit=args.fit,
             model=args.model,
             labels=args.label,
             fig_size=args.fig_size,
