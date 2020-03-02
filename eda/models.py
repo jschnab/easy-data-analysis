@@ -17,40 +17,65 @@ logging.basicConfig(
     level=logging.DEBUG,
 )
 
-INITIAL_PARAMS_FIRST_ORDER_DECAY = [-1, -1, 1]
-INITIAL_PARAMS_SECOND_ORDER_DECAY = [-1, -1, -1, -1, 1]
-PARAM_BOUNDS = (-1, 1)
-
-model_info = {
-    "first_exp": {
-        "equation": "y = a * exp(k * x) + b",
-        "params": ["a", "k", "b"],
-    },
-    "second_exp": {
-        "equation": "y = a1 * exp(k1 * x) + a2 * (k2 * x) + b",
-        "params": ["a1", "a2", "k1", "k2", "b"],
-    },
-    "linear": {
-        "equation": "y = a * x + b",
-        "params": ["a", "b"],
-    },
-}
+INITIAL_PARAMS_FIRST_ORDER_DECAY = [-1, -1]
+INITIAL_PARAMS_SECOND_ORDER_DECAY = [0, 0, 0, 0]
+BOUNDS = (-2, 2)
+METHOD = "trf"
+LOSS = "linear"
+FTOL = 1e-6
+MAX_NFEV = 1600
 
 
 @log_errors
-def first_order_exponential_decay(x, a, k, b):
+def first_order_exponential(x, a, k):
     """
-    Defines a first-order exponential decay function (k < 0).
+    Defines a first-order exponential function.
     """
-    return a * np.exp(k * x) + b
+    return a * np.exp(k * x)
 
 
 @log_errors
-def second_order_exponential_decay(x, a1, a2, k1, k2, b):
+def second_order_exponential(x, a1, a2, k1, k2):
     """
-    Defines a second-order exponential decay function (k < 0).
+    Defines a second-order exponential function.
     """
-    return a1 * np.exp(k1 * x) + a2 * np.exp(k2 * x) + b
+    return a1 * np.exp(k1 * x) + a2 * np.exp(k2 * x)
+
+
+@log_errors
+def linear(x, a, b):
+    """
+    Defines a linear function.
+    """
+    return a * x + b
+
+
+@log_errors
+def get_model_info(model_name):
+    """
+    Return information about a model given its name.
+
+    :param str model_name: model name
+    :return dict: model information
+    """
+    model_info = {
+        "exp1": {
+            "function": first_order_exponential,
+            "equation": "y = a * exp(k * x)",
+            "params": ["a", "k"],
+        },
+        "exp2": {
+            "function": second_order_exponential,
+            "equation": "y = a1 * exp(k1 * x) + a2 * exp(k2 * x)",
+            "params": ["a1", "a2", "k1", "k2"],
+        },
+        "linear": {
+            "function": linear,
+            "equation": "y = a * x + b",
+            "params": ["a", "b"],
+        },
+    }
+    return model_info[model_name]
 
 
 @log_errors
@@ -73,8 +98,10 @@ def fit_data(
     x,
     y,
     func,
-    initial_parameters=None,
-    bounds=(float("-inf"), float("+inf")),
+    initial_parameters=INITIAL_PARAMS_FIRST_ORDER_DECAY,
+    bounds=BOUNDS,
+    method=METHOD,
+    ftol=1e-8,
 ):
     """
     Fit experimental data with a function.
@@ -94,6 +121,9 @@ def fit_data(
             y,
             p0=initial_parameters,
             bounds=bounds,
+            method=method,
+            ftol=ftol,
+            loss=LOSS,
         )
     perr = np.sqrt(np.diag(pcov))
     rsq = get_r_sq_adj(y, func(x, *popt), len(popt))
@@ -164,23 +194,27 @@ def compare_exponential_models(x, y):
     popt1, perr1, fitted1, rsq1 = fit_data(
         x,
         y,
-        first_order_exponential_decay,
+        first_order_exponential,
         initial_parameters=INITIAL_PARAMS_FIRST_ORDER_DECAY,
-        bounds=PARAM_BOUNDS,
+        bounds=(-2, 2),
+        method=METHOD,
     )
     popt2, perr2, fitted2, rsq2 = fit_data(
         x,
         y,
-        second_order_exponential_decay,
+        second_order_exponential,
         initial_parameters=INITIAL_PARAMS_SECOND_ORDER_DECAY,
         bounds=PARAM_BOUNDS,
+        method=METHOD,
+        loss=LOSS,
+        ftol=FTOL,
     )
 
     y_mean = y.mean()
     syy = ((y - y_mean) ** 2).sum()
 
     # ANOVA first-order exponential
-    y_hat1 = np.array(first_order_exponential_decay(x, *popt1))
+    y_hat1 = np.array(first_order_exponential(x, *popt1))
     resid_ss1 = ((y - y_hat1) ** 2).sum()
     reg_ss1 = syy - resid_ss1
     total_ms1 = syy / (len(y) - 1)
@@ -188,7 +222,7 @@ def compare_exponential_models(x, y):
     resid_ms1 = resid_ss1 / (len(y) - len(popt1))
 
     # ANOVA second-order exponential
-    y_hat2 = np.array(second_order_exponential_decay(x, *popt2))
+    y_hat2 = np.array(second_order_exponential(x, *popt2))
     resid_ss2 = ((y - y_hat2) ** 2).sum()
     reg_ss2 = syy - resid_ss2
     total_ms2 = syy / (len(y) - 1)
@@ -206,29 +240,29 @@ def compare_exponential_models(x, y):
 
 
 @log_errors
-def print_params(label, name, params, popt, errors, rsq):
+def print_params(label, name, popt, errors, rsq):
     """
     Displays model parameters on the console.
 
     :param str label: label to identify the data
     :param str name: name of the model
-    :param tuple[str] params: name of parameters
     :param tuple[float] popt: optimal parameters values from fitting
     :param tuple[float] errors: standard error of optimal parameters
     :param float r: adjusted R-square
     """
+    params = get_model_info(name)["params"]
     print(f"{label}")
-    print(f"{model_info[name]['equation']}")
+    print(f"{get_model_info(name)['equation']}")
     print("-" * 30)
     print("{0:10}{1:>10}{2:>10}".format("Parameter", "Value", "Std Err"))
     print("-" * 30)
     for i in range(len(params)):
         print(f"{params[i]:10}{popt[i]:+10.4f}{errors[i]:10.4f}")
     print("{0:10}{1:10.5f}".format("R-square", rsq))
-    if name == "first_exp":
+    if name == "exp1":
         t = get_t_half(popt[1])
         print("{0:10}{1:10.2f}".format("t1 (sec)", t))
-    if name == "second_exp":
+    if name == "exp2":
         t1 = get_t_half(popt[2])
         t2 = get_t_half(popt[3])
         print("{0:10}{1:10.2f}".format("t1 (sec)", t1))

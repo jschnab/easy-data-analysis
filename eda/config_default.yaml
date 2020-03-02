@@ -13,7 +13,7 @@ plot:
         title:
     kinetics:
         fit: True 
-        model: "exponential"
+        model: "exp1"
         use_cols: [0, 1]
         figure_size: [7, 5]
         xcolumn: "Time (min)"

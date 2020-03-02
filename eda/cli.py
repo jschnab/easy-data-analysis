@@ -210,18 +210,18 @@ class CliParser:
             "--fit",
             action="store_true",
             help=(
-                "Fit the data using a model (first-order exponential decay by "
-                "defaut, specify model with '-f' or '--fit' argument)"
+                "Fit the data using a model, specify model with the '-f' or "
+                "'--fit' argument)"
             ),
         )
         parser.add_argument(
             "-m",
             "--model",
-            choices=["exponential"],
-            default="exponential",
+            choices=["linear", "exp1", "exp2"],
             help=(
-                "Specify the model to use when fitting data (default is "
-                "exponential)"
+                "Specify the model to use when fitting data, choose 'linear' "
+                "(linear model), 'exp1' (first-order exponential), 'exp2' "
+                "(second-order exponential)"
             ),
         )
         parser.add_argument(

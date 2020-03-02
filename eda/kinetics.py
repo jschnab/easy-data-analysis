@@ -13,7 +13,7 @@ import pandas as pd
 from eda.models import (
     compare_exponential_models,
     fit_data,
-    model_info,
+    get_model_info,
     print_params,
 )
 from eda.utils import (
@@ -162,18 +162,15 @@ def run(input_files, **kwargs):
                     )
                 x = df[kwargs.get("x_col", config["xcolumn"])]
                 y = df[kwargs.get("y_col", config["ycolumn"])]
-                if model == "exponential":
-                    model, popt, perr, fitted, r = compare_exponential_models(
-                        x,
-                        y,
-                    )
-                else:
-                    popt, perr, fitted, r = fit_data(x, y, model)
+                popt, perr, fitted, r = fit_data(
+                    x,
+                    y,
+                    get_model_info(model)["function"],
+                )
                 print()
                 print_params(
                     label,
                     model,
-                    model_info[model]["params"],
                     popt,
                     perr,
                     r,
