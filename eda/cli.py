@@ -81,10 +81,7 @@ class CliParser:
 
     def spectrum(self):
         parser = ArgumentParser(
-            description=(
-                "Plot an absorbance spectrum. "
-                "For more information: eda plot spectrum -h"
-            ),
+            description=("Plot an absorbance spectrum"),
             usage=(
                 "eda plot spectrum file [file ...] [-h] [-l] [--figure-size] "
                 "[--xcolumn] [--ycolumn] [--xlabel] [--ylabel] [--xlimit] "
@@ -190,9 +187,7 @@ class CliParser:
     def kinetics(self):
         parser = ArgumentParser(
             description=(
-                "Plot an absorbance kinetics curve. "
-                "For more information: eda plot kinetics -h"
-            ),
+                "Plot an absorbance kinetics curve"),
             usage=(
                 "eda plot spectrum file [file ...] [-h] [-f] [-m] [-l] "
                 "[--figure-size] [--xcolumn] [--ycolumn] [--xlabel] [--ylabel]"

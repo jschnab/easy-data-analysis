@@ -17,21 +17,22 @@ logging.basicConfig(
     level=logging.DEBUG,
 )
 
-INITIAL_PARAMS_FIRST_ORDER_DECAY = [-1, -1]
+INITIAL_PARAMS_FIRST_ORDER_DECAY = [1, -1, 1]
 INITIAL_PARAMS_SECOND_ORDER_DECAY = [0, 0, 0, 0]
-BOUNDS = (-2, 2)
-METHOD = "trf"
+BOUNDS = (float("-inf"), float("inf"))
+#BOUNDS = (-2, 2)
+METHOD = "lm"
 LOSS = "linear"
-FTOL = 1e-6
+FTOL = 1e-8
 MAX_NFEV = 1600
 
 
 @log_errors
-def first_order_exponential(x, a, k):
+def first_order_exponential(x, a, k, b):
     """
     Defines a first-order exponential function.
     """
-    return a * np.exp(k * x)
+    return a * np.exp(k * x) + b
 
 
 @log_errors
@@ -61,8 +62,8 @@ def get_model_info(model_name):
     model_info = {
         "exp1": {
             "function": first_order_exponential,
-            "equation": "y = a * exp(k * x)",
-            "params": ["a", "k"],
+            "equation": "y = a * exp(k * x) + b",
+            "params": ["a", "k", "b"],
         },
         "exp2": {
             "function": second_order_exponential,
@@ -98,10 +99,10 @@ def fit_data(
     x,
     y,
     func,
-    initial_parameters=INITIAL_PARAMS_FIRST_ORDER_DECAY,
+    initial_parameters=None,
     bounds=BOUNDS,
     method=METHOD,
-    ftol=1e-8,
+    ftol=FTOL,
 ):
     """
     Fit experimental data with a function.
@@ -123,7 +124,6 @@ def fit_data(
             bounds=bounds,
             method=method,
             ftol=ftol,
-            loss=LOSS,
         )
     perr = np.sqrt(np.diag(pcov))
     rsq = get_r_sq_adj(y, func(x, *popt), len(popt))
