@@ -212,11 +212,21 @@ class CliParser:
         parser.add_argument(
             "-m",
             "--model",
-            choices=["linear", "exp1", "exp2"],
+            choices=["linear", "exp1", "exp2", "exp"],
             help=(
                 "Specify the model to use when fitting data, choose 'linear' "
                 "(linear model), 'exp1' (first-order exponential), 'exp2' "
-                "(second-order exponential)"
+                "(second-order exponential), or 'exp' (select the best fit "
+                "between 'exp1' and 'exp2')"
+            ),
+        )
+        parser.add_argument(
+            "--init-params",
+            nargs="+",
+            help=(
+                "The initial parameters to use when fitting data (make sure "
+                "the number of parameters is appropriate for the selected "
+                "model)"
             ),
         )
         parser.add_argument(
@@ -299,6 +309,7 @@ class CliParser:
             input_files=args.file,
             fit=args.fit,
             model=args.model,
+            init_params=args.init_params,
             labels=args.label,
             fig_size=args.fig_size,
             x_col=args.xcolumn,

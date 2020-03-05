@@ -12,8 +12,12 @@ plot:
         legend_location: "upper left"
         title:
     kinetics:
-        fit: True 
+        fit: True
         model: "exp1"
+        init_params:
+            exp1: [1, -1, 1]
+            exp2: [0, 0, 0, 0]
+            linear: [1, 1]
         use_cols: [0, 1]
         figure_size: [7, 5]
         xcolumn: "Time (min)"

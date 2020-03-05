@@ -17,14 +17,10 @@ logging.basicConfig(
     level=logging.DEBUG,
 )
 
-INITIAL_PARAMS_FIRST_ORDER_DECAY = [1, -1, 1]
-INITIAL_PARAMS_SECOND_ORDER_DECAY = [0, 0, 0, 0]
+INIT_PARAMS_FIRST_ORDER_DECAY = [1, -1, 1]
+INIT_PARAMS_SECOND_ORDER_DECAY = [0, 0, 0, 0]
 BOUNDS = (float("-inf"), float("inf"))
-#BOUNDS = (-2, 2)
 METHOD = "lm"
-LOSS = "linear"
-FTOL = 1e-8
-MAX_NFEV = 1600
 
 
 @log_errors
@@ -94,7 +90,6 @@ def get_t_half(k, unit="minutes"):
     return np.log(2) / abs(k) * multi[unit]
 
 
-@log_errors
 def fit_data(
     x,
     y,
@@ -102,7 +97,6 @@ def fit_data(
     initial_parameters=None,
     bounds=BOUNDS,
     method=METHOD,
-    ftol=FTOL,
 ):
     """
     Fit experimental data with a function.
@@ -120,10 +114,9 @@ def fit_data(
             func,
             x,
             y,
-            #p0=initial_parameters,
-            #bounds=bounds,
-            #method=method,
-            #ftol=ftol,
+            p0=initial_parameters,
+            bounds=bounds,
+            method=method,
         )
     perr = np.sqrt(np.diag(pcov))
     rsq = get_r_sq_adj(y, func(x, *popt), len(popt))
@@ -133,6 +126,23 @@ def fit_data(
         "y": func(x_fitted, *popt),
     })
     return popt, perr, fitted, rsq
+
+
+@log_errors
+def fit_data_catch_error(
+    x,
+    y,
+    func,
+    initial_parameters=None,
+    bounds=BOUNDS,
+    method=METHOD,
+):
+    """
+    Same as 'fit_data' above but with error management.
+    This is because when we call 'compare_exponential_models' we do not want
+    to have 'log_errors' manage errors for us.
+    """
+    return fit_data(x, y, func, initial_parameters, bounds, method)
 
 
 @log_errors
@@ -178,7 +188,14 @@ def get_r_sq(y, fitted, n_params):
 
 
 @log_errors
-def compare_exponential_models(x, y):
+def compare_exponential_models(
+    x,
+    y,
+    init_params_first_order=INIT_PARAMS_FIRST_ORDER_DECAY,
+    init_params_second_order=INIT_PARAMS_SECOND_ORDER_DECAY,
+    bounds=BOUNDS,
+    method=METHOD,
+):
     """
     Compare first- and second-order exponential models to fit the data
     and return results corresponding to the best model.
@@ -191,24 +208,38 @@ def compare_exponential_models(x, y):
     :return: model name, optimal parameters, parameters standard error,
              fitted data, p-value
     """
-    popt1, perr1, fitted1, rsq1 = fit_data(
-        x,
-        y,
-        first_order_exponential,
-        initial_parameters=INITIAL_PARAMS_FIRST_ORDER_DECAY,
-        bounds=(-2, 2),
-        method=METHOD,
-    )
-    popt2, perr2, fitted2, rsq2 = fit_data(
-        x,
-        y,
-        second_order_exponential,
-        initial_parameters=INITIAL_PARAMS_SECOND_ORDER_DECAY,
-        bounds=PARAM_BOUNDS,
-        method=METHOD,
-        loss=LOSS,
-        ftol=FTOL,
-    )
+    try:
+        popt1, perr1, fitted1, rsq1 = fit_data(
+            x,
+            y,
+            first_order_exponential,
+            initial_parameters=init_params_first_order,
+            bounds=bounds,
+            method=method,
+        )
+    except RuntimeError:
+        popt1 = np.array([0, 0, 0])
+        perr1 = np.sqrt(np.diag(np.ones((3, 3)) * float("inf")))
+        fitted1 = pd.DataFrame()
+        rsq1 = 0
+
+    try:
+        popt2, perr2, fitted2, rsq2 = fit_data(
+            x,
+            y,
+            second_order_exponential,
+            initial_parameters=init_params_second_order,
+            bounds=bounds,
+            method=method,
+        )
+    except RuntimeError:
+        popt2 = np.array([0, 0, 0, 0])
+        perr2 = np.sqrt(np.diag(np.ones((4, 4)) * float("inf")))
+        fitted2 = pd.DataFrame()
+        rsq2 = 0
+
+    if rsq1 == 0 and rsq2 == 0:
+        raise RuntimeError("Could not fit data")
 
     y_mean = y.mean()
     syy = ((y - y_mean) ** 2).sum()
@@ -217,16 +248,11 @@ def compare_exponential_models(x, y):
     y_hat1 = np.array(first_order_exponential(x, *popt1))
     resid_ss1 = ((y - y_hat1) ** 2).sum()
     reg_ss1 = syy - resid_ss1
-    total_ms1 = syy / (len(y) - 1)
-    reg_ms1 = reg_ss1 / (len(popt1) - 1)
-    resid_ms1 = resid_ss1 / (len(y) - len(popt1))
 
     # ANOVA second-order exponential
     y_hat2 = np.array(second_order_exponential(x, *popt2))
     resid_ss2 = ((y - y_hat2) ** 2).sum()
     reg_ss2 = syy - resid_ss2
-    total_ms2 = syy / (len(y) - 1)
-    reg_ms2 = reg_ss2 / (len(popt2) - 1)
     resid_ms2 = resid_ss2 / (len(y) - len(popt2))
 
     # test if second-order is better fit than first-order
@@ -234,9 +260,9 @@ def compare_exponential_models(x, y):
     p_val = 1 - stats.f.cdf(vr, len(popt2) - 1, len(y) - len(popt2))
 
     if p_val < 0.05:
-        return "second_exp", popt2, perr2, fitted2, rsq2
+        return "exp2", popt2, perr2, fitted2, rsq2
     else:
-        return "first_exp", popt1, perr1, fitted1, rsq1
+        return "exp1", popt1, perr1, fitted1, rsq1
 
 
 @log_errors

@@ -19,6 +19,7 @@ transform_input = {
     "title": lambda x: x,
     "fit": lambda x: True if x.lower() == 'true' else False,
     "model": lambda x: x,
+    "init_params": lambda x: list(map(float, x.split())),
 }
 
 

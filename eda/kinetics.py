@@ -12,7 +12,7 @@ import pandas as pd
 
 from eda.models import (
     compare_exponential_models,
-    fit_data,
+    fit_data_catch_error,
     get_model_info,
     print_params,
 )
@@ -160,11 +160,26 @@ def run(input_files, **kwargs):
                         "argument to `eda plot kinetics` or configure the "
                         "default model"
                     )
-                popt, perr, fitted, r = fit_data(
-                    df[kwargs.get("x_col", config["xcolumn"])],
-                    df[kwargs.get("y_col", config["ycolumn"])],
-                    get_model_info(model)["function"],
-                )
+                if model == "exp":
+                    model, popt, perr, fitted, r = compare_exponential_models(
+                        df[kwargs.get("x_col", config["xcolumn"])],
+                        df[kwargs.get("y_col", config["ycolumn"])],
+                        kwargs.get(
+                            "init_params",
+                            config["init_params"]["exp1"]),
+                        kwargs.get(
+                            "init_params",
+                            config["init_params"]["exp2"]),
+                    )
+                else:
+                    popt, perr, fitted, r = fit_data_catch_error(
+                        df[kwargs.get("x_col", config["xcolumn"])],
+                        df[kwargs.get("y_col", config["ycolumn"])],
+                        get_model_info(model)["function"],
+                        kwargs.get(
+                            "init_params",
+                            config["init_params"][model]),
+                    )
                 print()
                 print_params(
                     label,
