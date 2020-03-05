@@ -120,10 +120,10 @@ def fit_data(
             func,
             x,
             y,
-            p0=initial_parameters,
-            bounds=bounds,
-            method=method,
-            ftol=ftol,
+            #p0=initial_parameters,
+            #bounds=bounds,
+            #method=method,
+            #ftol=ftol,
         )
     perr = np.sqrt(np.diag(pcov))
     rsq = get_r_sq_adj(y, func(x, *popt), len(popt))

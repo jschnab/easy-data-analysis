@@ -152,7 +152,7 @@ def run(input_files, **kwargs):
             )
             dfs.append(df)
             fitted = pd.DataFrame()
-            if kwargs.get("fit") or config["fit"]:
+            if kwargs.get("fit", config["fit"]):
                 model = kwargs.get("model") or config["model"]
                 if not model:
                     raise ValueError(
@@ -160,11 +160,9 @@ def run(input_files, **kwargs):
                         "argument to `eda plot kinetics` or configure the "
                         "default model"
                     )
-                x = df[kwargs.get("x_col", config["xcolumn"])]
-                y = df[kwargs.get("y_col", config["ycolumn"])]
                 popt, perr, fitted, r = fit_data(
-                    x,
-                    y,
+                    df[kwargs.get("x_col", config["xcolumn"])],
+                    df[kwargs.get("y_col", config["ycolumn"])],
                     get_model_info(model)["function"],
                 )
                 print()
