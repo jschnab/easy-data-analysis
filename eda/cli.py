@@ -192,7 +192,7 @@ class CliParser:
                 "eda plot spectrum file [file ...] [-h] [-f] [-m] [-l] "
                 "[--figure-size] [--xcolumn] [--ycolumn] [--xlabel] [--ylabel]"
                 " [--xlimit] [--ylimit] [--skip-header] [--legend-location] "
-                "[--title]"
+                "[--title] [--time-unit] [--init-params]"
             ),
         )
         parser.add_argument(
@@ -223,6 +223,7 @@ class CliParser:
         parser.add_argument(
             "--init-params",
             nargs="+",
+            type=float,
             help=(
                 "The initial parameters to use when fitting data (make sure "
                 "the number of parameters is appropriate for the selected "
@@ -302,7 +303,12 @@ class CliParser:
             "--title",
             nargs="?",
             type=str,
-            help="Specify the title of the plot",
+            help="Title of the plot",
+        )
+        parser.add_argument(
+            "--time-unit",
+            choices=["minute", "second"],
+            help="Time unit of the kinetics experiment",
         )
         args = parser.parse_args(sys.argv[3:])
         kinetics.run(
@@ -321,6 +327,7 @@ class CliParser:
             skip_header=args.skip_header,
             legend_loc=args.legend_loc,
             title=args.title,
+            time_unit=args.time_unit,
         )
 
 

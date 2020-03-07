@@ -187,6 +187,7 @@ def run(input_files, **kwargs):
                     popt,
                     perr,
                     r,
+                    kwargs.get("time_unit", config["time_unit"]),
                 )
             models.append(fitted)
         plot_kinetics(

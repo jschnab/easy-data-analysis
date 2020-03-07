@@ -76,7 +76,7 @@ def get_model_info(model_name):
 
 
 @log_errors
-def get_t_half(k, unit="minutes"):
+def get_t_half(k, unit="minute"):
     """
     Calculate the t1/2 constant of an exponential function, and return
     its value in seconds.
@@ -86,7 +86,7 @@ def get_t_half(k, unit="minutes"):
                      default is minutes)
     :return float: t1/2 constant
     """
-    multi = {"minutes": 60, "seconds": 1}
+    multi = {"minute": 60, "second": 1}
     return np.log(2) / abs(k) * multi[unit]
 
 
@@ -119,7 +119,7 @@ def fit_data(
             method=method,
         )
     perr = np.sqrt(np.diag(pcov))
-    rsq = get_r_sq_adj(y, func(x, *popt), len(popt))
+    rsq = get_r_sq(y, func(x, *popt), len(popt))
     x_fitted = np.linspace(min(x), max(x), 10000)
     fitted = pd.DataFrame({
         "x": x_fitted,
@@ -175,7 +175,7 @@ def get_r_sq(y, fitted, n_params):
     :param numpy.array y: dependent variable
     :param numpy.array fitted: values fitted by the model
     :param int n_params: number of parameters of the model
-    :return float: adjusted R-squared value
+    :return float: R-squared value
     """
     y_mean = y.mean()
     # total sum of squares
@@ -266,7 +266,7 @@ def compare_exponential_models(
 
 
 @log_errors
-def print_params(label, name, popt, errors, rsq):
+def print_params(label, name, popt, errors, rsq, time_unit):
     """
     Displays model parameters on the console.
 
@@ -274,7 +274,8 @@ def print_params(label, name, popt, errors, rsq):
     :param str name: name of the model
     :param tuple[float] popt: optimal parameters values from fitting
     :param tuple[float] errors: standard error of optimal parameters
-    :param float r: adjusted R-square
+    :param float rsq: R-square
+    :param str time_unit: Time unit of the kinetics experiment
     """
     params = get_model_info(name)["params"]
     print(f"{label}")
@@ -286,10 +287,10 @@ def print_params(label, name, popt, errors, rsq):
         print(f"{params[i]:10}{popt[i]:+10.4f}{errors[i]:10.4f}")
     print("{0:10}{1:10.5f}".format("R-square", rsq))
     if name == "exp1":
-        t = get_t_half(popt[1])
+        t = get_t_half(popt[1], time_unit)
         print("{0:10}{1:10.2f}".format("t1 (sec)", t))
     if name == "exp2":
-        t1 = get_t_half(popt[2])
-        t2 = get_t_half(popt[3])
+        t1 = get_t_half(popt[2], time_unit)
+        t2 = get_t_half(popt[3], time_unit)
         print("{0:10}{1:10.2f}".format("t1 (sec)", t1))
         print("{0:10}{1:10.2f}".format("t2 (sec)", t2))

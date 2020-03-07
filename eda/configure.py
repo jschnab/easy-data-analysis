@@ -20,6 +20,7 @@ transform_input = {
     "fit": lambda x: True if x.lower() == 'true' else False,
     "model": lambda x: x,
     "init_params": lambda x: list(map(float, x.split())),
+    "time_unit": lambda x: x,
 }
 
 

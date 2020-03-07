@@ -13,10 +13,10 @@ plot:
         title:
     kinetics:
         fit: True
-        model: "exp1"
+        model: "exp"
         init_params:
             exp1: [1, -1, 1]
-            exp2: [0, 0, 0, 0]
+            exp2: [1, 1, 0, 0]
             linear: [1, 1]
         use_cols: [0, 1]
         figure_size: [7, 5]
@@ -29,4 +29,4 @@ plot:
         skip_header: 1
         legend_location: "lower right"
         title:
-
+        time_unit: "minute"
