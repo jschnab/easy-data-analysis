@@ -280,17 +280,17 @@ def print_params(label, name, popt, errors, rsq, time_unit):
     params = get_model_info(name)["params"]
     print(f"{label}")
     print(f"{get_model_info(name)['equation']}")
-    print("-" * 30)
-    print("{0:10}{1:>10}{2:>10}".format("Parameter", "Value", "Std Err"))
-    print("-" * 30)
+    print("-" * 32)
+    print("{0:10}{1:>11}{2:>11}".format("Parameter", "Value", "Std Err"))
+    print("-" * 32)
     for i in range(len(params)):
-        print(f"{params[i]:10}{popt[i]:+10.4f}{errors[i]:10.4f}")
-    print("{0:10}{1:10.5f}".format("R-square", rsq))
+        print(f"{params[i]:10}{popt[i]:+11.5f}{errors[i]:11.5f}")
+    print("{0:10}{1:11.5f}".format("R-square", rsq))
     if name == "exp1":
         t = get_t_half(popt[1], time_unit)
-        print("{0:10}{1:10.2f}".format("t1 (sec)", t))
+        print("{0:10}{1:11.2f}".format("t1 (sec)", t))
     if name == "exp2":
         t1 = get_t_half(popt[2], time_unit)
         t2 = get_t_half(popt[3], time_unit)
-        print("{0:10}{1:10.2f}".format("t1 (sec)", t1))
-        print("{0:10}{1:10.2f}".format("t2 (sec)", t2))
+        print("{0:10}{1:11.2f}".format("t1 (sec)", t1))
+        print("{0:10}{1:11.2f}".format("t2 (sec)", t2))
