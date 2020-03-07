@@ -35,7 +35,7 @@ class ConfigurationManager:
 
     def print_info(self):
         print()
-        print(f"Configuration instructions")
+        print("Configuration instructions")
         print("--------------------------")
         print("The current value is displayed between ( parentheses ).")
         print("The absence of value is indicated by 'None'.")
@@ -55,6 +55,24 @@ class ConfigurationManager:
         inputs = {}
         for key, value in config["plot"][subcommand].items():
             while True:
+                # special case: init_params is a nested dictionary
+                if key == "init_params":
+                    print("init_params:")
+                    init_params = {}
+                    for model, params in value.items():
+                        while True:
+                            user_input = input(f"    {model} ( {params} ):")
+                            if not user_input or user_input.lower() == "none":
+                                init_params[model] = params
+                                break
+                            try:
+                                t = transform_input["init_params"](user_input)
+                            except ValueError:
+                                print("Invalid value")
+                                continue
+                            init_params[model] = t
+                    inputs[key] = init_params
+                    break
                 user_input = input(f"{key} ( {value} ): ")
                 if not user_input:
                     inputs[key] = value
