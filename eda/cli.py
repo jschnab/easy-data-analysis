@@ -81,10 +81,7 @@ class CliParser:
 
     def spectrum(self):
         parser = ArgumentParser(
-            description=(
-                "Plot an absorbance spectrum. "
-                "For more information: eda plot spectrum -h"
-            ),
+            description=("Plot an absorbance spectrum"),
             usage=(
                 "eda plot spectrum file [file ...] [-h] [-l] [--figure-size] "
                 "[--xcolumn] [--ycolumn] [--xlabel] [--ylabel] [--xlimit] "
@@ -190,14 +187,12 @@ class CliParser:
     def kinetics(self):
         parser = ArgumentParser(
             description=(
-                "Plot an absorbance kinetics curve. "
-                "For more information: eda plot kinetics -h"
-            ),
+                "Plot an absorbance kinetics curve"),
             usage=(
-                "eda plot spectrum file [file ...] [-h] [-m] [-l] "
+                "eda plot spectrum file [file ...] [-h] [-f] [-m] [-l] "
                 "[--figure-size] [--xcolumn] [--ycolumn] [--xlabel] [--ylabel]"
                 " [--xlimit] [--ylimit] [--skip-header] [--legend-location] "
-                "[--title]"
+                "[--title] [--time-unit] [--init-params]"
             ),
         )
         parser.add_argument(
@@ -206,10 +201,34 @@ class CliParser:
             help="CSV files storing data to plot",
         )
         parser.add_argument(
+            "-f",
+            "--fit",
+            action="store_true",
+            help=(
+                "Fit the data using a model, specify model with the '-f' or "
+                "'--fit' argument)"
+            ),
+        )
+        parser.add_argument(
             "-m",
             "--model",
-            action="store_true",
-            help="Model the data using exponential decay",
+            choices=["linear", "exp1", "exp2", "exp"],
+            help=(
+                "Specify the model to use when fitting data, choose 'linear' "
+                "(linear model), 'exp1' (first-order exponential), 'exp2' "
+                "(second-order exponential), or 'exp' (select the best fit "
+                "between 'exp1' and 'exp2')"
+            ),
+        )
+        parser.add_argument(
+            "--init-params",
+            nargs="+",
+            type=float,
+            help=(
+                "The initial parameters to use when fitting data (make sure "
+                "the number of parameters is appropriate for the selected "
+                "model)"
+            ),
         )
         parser.add_argument(
             "-l",
@@ -284,12 +303,19 @@ class CliParser:
             "--title",
             nargs="?",
             type=str,
-            help="Specify the title of the plot",
+            help="Title of the plot",
+        )
+        parser.add_argument(
+            "--time-unit",
+            choices=["minute", "second"],
+            help="Time unit of the kinetics experiment",
         )
         args = parser.parse_args(sys.argv[3:])
         kinetics.run(
             input_files=args.file,
+            fit=args.fit,
             model=args.model,
+            init_params=args.init_params,
             labels=args.label,
             fig_size=args.fig_size,
             x_col=args.xcolumn,
@@ -301,6 +327,7 @@ class CliParser:
             skip_header=args.skip_header,
             legend_loc=args.legend_loc,
             title=args.title,
+            time_unit=args.time_unit,
         )
 
 

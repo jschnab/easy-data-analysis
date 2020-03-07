@@ -8,11 +8,14 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
-from scipy.optimize import curve_fit
-
+from eda.models import (
+    compare_exponential_models,
+    fit_data_catch_error,
+    get_model_info,
+    print_params,
+)
 from eda.utils import (
     get_end_of_data,
     get_linesep,
@@ -45,48 +48,6 @@ LEGEND_LOC = "lower right"
 
 
 @log_errors
-def exponential(x, a, k, b):
-    """
-    Defines a negative exponential function (k < 0).
-    """
-    return a * np.exp(-k * x) + b
-
-
-@log_errors
-def fit_data(x, y, func, initial_parameters=None):
-    """
-    Fit experimental data with a function.
-
-    :param array-like x: independent variable data
-    :param array-like y: dependent variable data
-    :param callable func: function to fit on the data
-    :param array-like initial_parameters: start curve fitting with these
-                                          parameters
-    :return: optimal parameters, parameters standard error, fitted data
-    """
-    popt, pcov = curve_fit(func, x, y, initial_parameters)
-    perr = np.sqrt(np.diag(pcov))
-    fitted = func(x, *popt)
-    return popt, perr, fitted
-
-
-@log_errors
-def print_params(params, errors, label):
-    """
-    Displays fitted parameters on the console.
-
-    :param tuple[float] params: fitted parameters
-    :param tuple[float] errors: standard error of fitted parameters
-    :param str label: label to identify the data
-    """
-    print(f"Data: {label}")
-    print(f"a    = {params[0]:+.4f} +/- {errors[0]:.4f}")
-    print(f"k    = {params[1]:+.4f} +/- {errors[1]:.4f}")
-    print(f"b    = {params[2]:+.4f} +/- {errors[2]:.4f}")
-    print(f"t1/2 = {np.log(2) / abs(params[1]) * 60:.2f} seconds")
-
-
-@log_errors
 def plot_kinetics(
     dfs,
     models,
@@ -105,9 +66,9 @@ def plot_kinetics(
     Plot absorbance kinetics from a pandas DataFrame, and overlays
     provided fitted data, if provided.
 
-    :param list[pandas.DataFrame] dfs: list of dataframes containing
-                                       the data to plot
-    :param list[array-like] models: list of fitted data to overlay
+    :param list[pandas.DataFrame] dfs: dataframes containing the data to plot
+    :param list[pandas.DataFrame] models: dataframes containing fitted data
+                                          to overlay
     :param list[str] labels: name of each curve in the plot
     """
     fig, ax = plt.subplots(figsize=fig_size)
@@ -122,8 +83,8 @@ def plot_kinetics(
         )
         if not models[i].empty:
             ax.plot(
-                df[x_col],
-                models[i],
+                models[i].x,
+                models[i].y,
                 c=FIT_COLOR,
                 label="Fitted",
                 zorder=0,
@@ -174,8 +135,6 @@ def run(input_files, **kwargs):
         sys.exit(1)
     dfs = []
     models = []
-    if kwargs.get("model") or config["model"]:
-        print("Model equation: absorbance = a * e^(k * time) + b")
     with TemporaryDirectory() as temp_dir:
         for infile, label in zip(input_files, kwargs["labels"]):
             output_path = ospath.join(temp_dir, "formatted.csv")
@@ -192,15 +151,44 @@ def run(input_files, **kwargs):
                 skipfooter=skip_footer,
             )
             dfs.append(df)
-            fitted = pd.Series()
-            if kwargs.get("model") or config["model"]:
-                popt, perr, fitted = fit_data(
-                    df[kwargs.get("x_col", config["xcolumn"])],
-                    df[kwargs.get("y_col", config["ycolumn"])],
-                    exponential,
-                )
+            fitted = pd.DataFrame()
+            if kwargs.get("fit", config["fit"]):
+                model = kwargs.get("model") or config["model"]
+                if not model:
+                    raise ValueError(
+                        "No model was selected. Please pass a model as an "
+                        "argument to `eda plot kinetics` or configure the "
+                        "default model"
+                    )
+                if model == "exp":
+                    model, popt, perr, fitted, r = compare_exponential_models(
+                        df[kwargs.get("x_col", config["xcolumn"])],
+                        df[kwargs.get("y_col", config["ycolumn"])],
+                        kwargs.get(
+                            "init_params",
+                            config["init_params"]["exp1"]),
+                        kwargs.get(
+                            "init_params",
+                            config["init_params"]["exp2"]),
+                    )
+                else:
+                    popt, perr, fitted, r = fit_data_catch_error(
+                        df[kwargs.get("x_col", config["xcolumn"])],
+                        df[kwargs.get("y_col", config["ycolumn"])],
+                        get_model_info(model)["function"],
+                        kwargs.get(
+                            "init_params",
+                            config["init_params"][model]),
+                    )
                 print()
-                print_params(popt, perr, label)
+                print_params(
+                    label,
+                    model,
+                    popt,
+                    perr,
+                    r,
+                    kwargs.get("time_unit", config["time_unit"]),
+                )
             models.append(fitted)
         plot_kinetics(
             dfs,
