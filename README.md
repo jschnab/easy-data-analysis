@@ -185,6 +185,6 @@ t2 (sec)     6600.02
 
 The first line is the file name, the second line is the equation of the data model. The following lines show the value and standard error of the parameters of the equation. The R-square value indicates the goodness of fit and varies from 0 (poor fit) to 1 (perfect fit). The parameters `t1` and `t2` are the halving times (or doubling times for exponential growth) of the first and second components of the equation. They are calculated as:
 
-<img src="eda/docs/images/half_time.png" width="133" alt="half time equation">
+<a href="https://www.codecogs.com/eqnedit.php?latex=t_x=\frac{\ln2}{k_x}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?t_x=\frac{\ln2}{k_x}" title="t_x=\frac{\ln2}{k_x}" /></a>
 
 `t1` and `t2` are shown in seconds and assume that you provide data in *minute* by default. If the time unit of your data is *second*, you can specify it by running `eda configure kinetics` and modify the parameter *time_unit* or by using the parameter `--time-unit` when calling `eda plot kinetics`.
