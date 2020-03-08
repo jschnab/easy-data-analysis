@@ -10,6 +10,7 @@ This package is written in Python 3.6 and was tested on Linux and MacOS 13. It d
 * matplotlib 3.1.3
 * numpy 1.18.4
 * pandas 0.25.3
+* pyyaml 5.3
 * scipy 1.4.1
 
 ## Installation

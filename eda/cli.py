@@ -189,7 +189,7 @@ class CliParser:
             description=(
                 "Plot an absorbance kinetics curve"),
             usage=(
-                "eda plot spectrum file [file ...] [-h] [-f] [-m] [-l] "
+                "eda plot kinetics file [file ...] [-h] [-f] [-m] [-l] "
                 "[--figure-size] [--xcolumn] [--ycolumn] [--xlabel] [--ylabel]"
                 " [--xlimit] [--ylimit] [--skip-header] [--legend-location] "
                 "[--title] [--time-unit] [--init-params]"
