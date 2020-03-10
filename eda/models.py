@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import sympy
 
 from scipy import stats
 from scipy.optimize import curve_fit
@@ -48,13 +49,18 @@ def linear(x, a, b):
 
 
 @log_errors
-def get_model_info(model_name):
+def get_model_info(model):
     """
     Return information about a model given its name.
 
-    :param str model_name: model name
+    :param str|dict model: model name or model information dictionary
     :return dict: model information
     """
+    # if the dictionary has already been built by the function
+    # 'fit_with_expression', return it untouched
+    if isinstance(model, dict):
+        return model
+
     model_info = {
         "exp1": {
             "function": first_order_exponential,
@@ -72,7 +78,7 @@ def get_model_info(model_name):
             "params": ["a", "b"],
         },
     }
-    return model_info[model_name]
+    return model_info["model"]
 
 
 @log_errors
@@ -139,10 +145,57 @@ def fit_data_catch_error(
 ):
     """
     Same as 'fit_data' above but with error management.
-    This is because when we call 'compare_exponential_models' we do not want
+    This is because when we call 'test_exponential_models' we do not want
     to have 'log_errors' manage errors for us.
     """
     return fit_data(x, y, func, initial_parameters, bounds, method)
+
+
+@log_errors
+def fit_with_expression(
+    xx,
+    yy,
+    string_expression,
+    initial_parameters=None,
+):
+    """
+    Fit y over x using a mathematical expression.
+    """
+    symbols, parsed_expression = parse_expression(string_expression)
+    expr = sympy.sympify(parsed_expression)
+    func = sympy.lambdify(sympy.symbols(symbols), expr, "numpy")
+    model = {
+        "function": func,
+        "equation": parsed_expression,
+        "params": symbols[1:],
+    }
+    popt, pcov = curve_fit(
+        func,
+        xx,
+        yy,
+        p0=initial_parameters,
+    )
+    perr = np.sqrt(np.diag(pcov))
+    rsq = get_r_sq(yy, func(xx, *popt), len(popt))
+    x_fitted = np.linspace(min(xx), max(xx), 10000)
+    fitted = pd.DataFrame({
+        "x": x_fitted,
+        "y": func(x_fitted, *popt),
+    })
+    return model, popt, perr, fitted, rsq
+
+
+@log_errors
+def parse_expression(string):
+    """
+    Parse an expression representing a mathematical function written like
+    'f: x, a, b = a*x**2 + b' and separates the symbols from the expression
+    itself
+    """
+    split_equal = string.split("=")
+    symbols = [s.strip() for s in split_equal[0].split(":")[1].split(",")]
+    expression = split_equal[1].strip()
+    return symbols, expression
 
 
 @log_errors
@@ -188,7 +241,7 @@ def get_r_sq(y, fitted, n_params):
 
 
 @log_errors
-def compare_exponential_models(
+def test_exponential_models(
     x,
     y,
     init_params_first_order=INIT_PARAMS_FIRST_ORDER_DECAY,

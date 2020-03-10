@@ -221,6 +221,13 @@ class CliParser:
             ),
         )
         parser.add_argument(
+            "--expression",
+            help=(
+                "Mathematical expression interpretable by the 'sympy' "
+                "library, to be used as the fit model. Example: x**2 + 3*x"
+            ),
+        ),
+        parser.add_argument(
             "--init-params",
             nargs="+",
             type=float,
@@ -315,6 +322,7 @@ class CliParser:
             input_files=args.file,
             fit=args.fit,
             model=args.model,
+            expression=args.expression,
             init_params=args.init_params,
             labels=args.label,
             fig_size=args.fig_size,

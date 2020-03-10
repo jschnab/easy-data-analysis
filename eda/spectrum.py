@@ -23,25 +23,13 @@ logging.basicConfig(
     level=logging.DEBUG,
 )
 
-# CSV file parameters
-WAVELENGTH_COL = "Wavelength (nm)"
-ABSORB_COL = "Abs"
-USE_COLS = list(range(2))
-SKIP_HEADER = 1
-
 # plotting parameters
-FIG_SIZE = (7, 5)
 COLORS = ["black", "C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"]
-X_LABEL = "Wavelength (nm)"
-Y_LABEL = "Absorbance (A.U.)"
-X_LIM = None
-Y_LIM = None
-LEGEND_LOC = "lower left"
 
 
 @log_errors
 def plot_spectrum(
-    dfs,
+    input_data,
     labels,
     fig_size,
     x_col,
@@ -57,12 +45,12 @@ def plot_spectrum(
     Plot a spectrum from a pandas DataFrame.
     Assumes two columns named 'Wavelength (nm)' and 'Abs'.
 
-    :param list[pandas.DataFrame] dfs: list of dataframes which contain the
-                                       data to plot.
+    :param list[pandas.DataFrame] input_data: list of dataframes which contain
+                                              the data to plot
     :param list[str] labels: name of each curve in the plot
     """
     fig, ax = plt.subplots(figsize=fig_size)
-    for i, df in enumerate(dfs):
+    for i, df in enumerate(input_data):
         ax.plot(
             df[x_col],
             df[y_col],
@@ -94,7 +82,10 @@ def run(input_files, **kwargs):
     config_file = ospath.join(str(Path.home()), ".edaconf")
     with open(config_file) as f:
         config = yaml.load(f, Loader=yaml.FullLoader)["plot"]["spectrum"]
+
     kwargs = {k: v for k, v in kwargs.items() if v is not None}
+
+    # get labels and check their number is correct
     if not kwargs.get("labels"):
         kwargs["labels"] = [
             ospath.split(ospath.abspath(infile))[-1]
@@ -107,15 +98,22 @@ def run(input_files, **kwargs):
             "label(s)"
         )
         sys.exit(1)
-    dfs = []
+
+    input_data = []
+
     with TemporaryDirectory() as temp_dir:
+
         for infile in input_files:
+            # make sure files have correct line endings
             output_path = ospath.join(temp_dir, "formatted.csv")
             linesep = get_linesep(infile)
             format_newlines(infile, len(linesep), output_path)
+
+            # calculate where data ends
             n_lines = get_number_lines(output_path)
             end_of_data = get_end_of_data(output_path)
             skip_footer = n_lines - end_of_data
+
             df = pd.read_csv(
                 output_path,
                 usecols=kwargs.get("use_cols", config["use_cols"]),
@@ -123,9 +121,10 @@ def run(input_files, **kwargs):
                 skiprows=kwargs.get("skip_header", config["skip_header"]),
                 skipfooter=skip_footer,
             )
-            dfs.append(df)
+            input_data.append(df)
+
         plot_spectrum(
-            dfs=dfs,
+            input_data=input_data,
             labels=kwargs["labels"],
             fig_size=kwargs.get("fig_size", config["figure_size"]),
             x_col=kwargs.get("x_col", config["xcolumn"]),
