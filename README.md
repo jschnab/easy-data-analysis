@@ -6,12 +6,12 @@ This package provides tools to analyze scientific research data, with a focus on
 
 ## Dependencies and Compatibility
 
-This package is written in Python 3.6 and was tested on Linux and MacOS 13. It depends on the following libraries:
-* matplotlib (tested on version 3.1.3)
-* numpy (tested on 1.18.4)
-* pandas (tested on 0.25.3)
-* pyyaml (tested on 5.3)
-* scipy (tested on 1.4.1)
+This package was developed with Python 3.6 and was tested on Linux and MacOS 13. It depends on the following libraries (the version of the library on which I tested `easy-data-analysis` is shown between parentheses):
+* matplotlib (3.1.3)
+* numpy (1.18.4)
+* pandas (0.25.3)
+* pyyaml (5.3)
+* scipy (1.4.1)
 
 ## Installation
 
