@@ -4,14 +4,14 @@
 
 This package provides tools to analyze scientific research data, with a focus on plotting and statistical analysis. It is written in Python and was tested on Linux and MacOS.
 
-## Compatibility
+## Dependencies and Compatibility
 
 This package is written in Python 3.6 and was tested on Linux and MacOS 13. It depends on the following libraries:
-* matplotlib 3.1.3
-* numpy 1.18.4
-* pandas 0.25.3
-* pyyaml 5.3
-* scipy 1.4.1
+* matplotlib (tested on version 3.1.3)
+* numpy (tested on 1.18.4)
+* pandas (tested on 0.25.3)
+* pyyaml (tested on 5.3)
+* scipy (tested on 1.4.1)
 
 ## Installation
 
@@ -142,10 +142,32 @@ eda plot kinetics -h
 
 You should do these two steps prior to the tutorial:
 * install the `easy-data-analysis` package
-* download the CSV data files from `eda/docs/`
+* download the CSV data files from `eda/docs/samples`
+
+These tutorials assume you have the default configuration. If you're not sure which configuration you have, run `eda configure default`.
+
+### Plot a spectrum curve
+
+Plotting spectra is done by providing the file names to `eda plot spectrum`:
+```
+eda plot spectrum spectrum1.csv spectrum2.csv
+```
+
+You should see this output:
+
+<img src="eda/docs/images/spectra.png" width="600" alt="spectra curves">
+
+There is some empty space above the curves, because the data shows high absorbance below 300 nm but the plot does not display this by default. We can easily adjust the axes limits using the optional arguments `--xlimit` and `--ylimit`. These arguments both accept two values: the lower value and the higher value.
+
+```
+eda plot kinetics spectrum1.csv spectrum2.csv --xlimit 325 500 --ylimit 0 1.3
+```
+
+You should then see the following plot:
+
+<img src="eda/docs/images/spectra_2.png" width="600" alt="spectra curves">
 
 ### Plot a kinetics curve
-
 
 Plotting a kinetics curve is done by providing the file names(s) to `eda plot kinetics`:
 ```
