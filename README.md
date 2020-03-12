@@ -211,3 +211,27 @@ The first line is the file name, the second line is the equation of the data mod
 <a href="https://www.codecogs.com/eqnedit.php?latex=t_x=\frac{\ln2}{|k_x|}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?t_x=\frac{\ln2}{|k_x|}" title="t_x=\frac{\ln2}{|k_x|}" /></a>
 
 `t1` and `t2` are shown in seconds and assume that you provide data in *minute* by default. If the time unit of your data is *second*, you can specify it by running `eda configure kinetics` and modify the parameter `time_unit` or by using the parameter `--time-unit` when calling `eda plot kinetics`.
+
+### Plot a kinetics curve with a user-defined expression
+
+You may feel limited by the fitting models hard-coded in `easy-data-analysis` by default. You can provide your own mathematical equation when fitting a kinetics curve using the parameter `--expression` which accepts the format `f:x, <parameters> = <equation>`. Only one variable, `x`, is accepted. Let's plot and fit `polynomial.csv`:
+```
+eda plot kinetics polynomial.csv -f --expression "f:x,a,b,c = a*x**3 + b*x**2 + c" --xcolumn x --ycolumn y --xlabel x --ylabel y --skip-header 0
+```
+
+You should see the following plot:
+
+<img src="eda/docs/images/fit_expression.png" width="600" alt="fit with expression plot">
+
+The results of the fit are also printed on the console:
+```
+polynomial.csv
+a*x**3 + b*x**2 +c
+--------------------------------
+Parameter       Value    Std Err
+--------------------------------
+a            +1.00168    0.02217
+b            +3.12044    0.29053
+c           -33.28376   13.83916
+R-square      0.95900
+```

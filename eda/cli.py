@@ -192,7 +192,7 @@ class CliParser:
                 "eda plot kinetics file [file ...] [-h] [-f] [-m] [-l] "
                 "[--figure-size] [--xcolumn] [--ycolumn] [--xlabel] [--ylabel]"
                 " [--xlimit] [--ylimit] [--skip-header] [--legend-location] "
-                "[--title] [--time-unit] [--init-params]"
+                "[--title] [--time-unit] [--init-params] [--expression]"
             ),
         )
         parser.add_argument(
@@ -223,8 +223,8 @@ class CliParser:
         parser.add_argument(
             "--expression",
             help=(
-                "Mathematical expression interpretable by the 'sympy' "
-                "library, to be used as the fit model. Example: x**2 + 3*x"
+                "Mathematical expression used as the fit model. Example: "
+                "f: x, a, b, c = a*x**2 + b*x + c"
             ),
         ),
         parser.add_argument(
