@@ -12,6 +12,7 @@ This package was developed with Python 3.6 and was tested on Linux and MacOS 13.
 * pandas (0.25.3)
 * pyyaml (5.3)
 * scipy (1.4.1)
+* sympy (1.5.1)
 
 ## Installation
 
@@ -160,7 +161,7 @@ You should see this output:
 There is some empty space above the curves, because the data shows high absorbance below 300 nm but the plot does not display this by default. We can easily adjust the axes limits using the optional arguments `--xlimit` and `--ylimit`. These arguments both accept two values: the lower value and the higher value.
 
 ```
-eda plot kinetics spectrum1.csv spectrum2.csv --xlimit 325 500 --ylimit 0 1.3
+eda plot spectrum spectrum1.csv spectrum2.csv --xlimit 325 500 --ylimit 0 1.3
 ```
 
 You should then see the following plot:
