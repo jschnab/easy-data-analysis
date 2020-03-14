@@ -189,10 +189,10 @@ class CliParser:
             description=(
                 "Plot an absorbance kinetics curve"),
             usage=(
-                "eda plot spectrum file [file ...] [-h] [-f] [-m] [-l] "
+                "eda plot kinetics file [file ...] [-h] [-f] [-m] [-l] "
                 "[--figure-size] [--xcolumn] [--ycolumn] [--xlabel] [--ylabel]"
                 " [--xlimit] [--ylimit] [--skip-header] [--legend-location] "
-                "[--title] [--time-unit] [--init-params]"
+                "[--title] [--time-unit] [--init-params] [--expression]"
             ),
         )
         parser.add_argument(
@@ -220,6 +220,13 @@ class CliParser:
                 "between 'exp1' and 'exp2')"
             ),
         )
+        parser.add_argument(
+            "--expression",
+            help=(
+                "Mathematical expression used as the fit model. Example: "
+                "f: x, a, b, c = a*x**2 + b*x + c"
+            ),
+        ),
         parser.add_argument(
             "--init-params",
             nargs="+",
@@ -315,6 +322,7 @@ class CliParser:
             input_files=args.file,
             fit=args.fit,
             model=args.model,
+            expression=args.expression,
             init_params=args.init_params,
             labels=args.label,
             fig_size=args.fig_size,

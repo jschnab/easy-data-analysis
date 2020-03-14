@@ -1,7 +1,7 @@
 import os
 from setuptools import setup
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -36,10 +36,11 @@ setup(
     python_requires=">=3.6.8",
     keywords="data analysis plotting statistics",
     install_requires=[
-        "matplotlib==3.1.*",
-        "numpy==1.18.*",
-        "pandas==0.25.*",
-        "scipy==1.4.*",
-        "pyyaml==5.3.*",
+        "matplotlib",
+        "numpy",
+        "pandas",
+        "pyyaml",
+        "scipy",
+        "sympy",
     ],
 )
