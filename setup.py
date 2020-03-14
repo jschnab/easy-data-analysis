@@ -39,7 +39,8 @@ setup(
         "matplotlib==3.1.*",
         "numpy==1.18.*",
         "pandas==0.25.*",
-        "scipy==1.4.*",
         "pyyaml==5.3.*",
+        "scipy==1.4.*",
+        "sympy==1.5.*",
     ],
 )
