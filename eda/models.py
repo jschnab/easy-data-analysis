@@ -78,7 +78,7 @@ def get_model_info(model):
             "params": ["a", "b"],
         },
     }
-    return model_info["model"]
+    return model_info[model]
 
 
 @log_errors
@@ -334,7 +334,7 @@ def print_params(label, name, popt, errors, rsq, time_unit):
     print(f"{label}")
     print(f"{get_model_info(name)['equation']}")
     print("-" * 32)
-    print("{0:10}{1:>11}{2:>11}".format("Parameter", "Value", "Std Err"))
+    print("{0:10}{1:>11}{2:>11}".format("Parameter", "Value", "Std Dev"))
     print("-" * 32)
     for i in range(len(params)):
         print(f"{params[i]:10}{popt[i]:+11.5f}{errors[i]:11.5f}")
