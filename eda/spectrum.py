@@ -24,6 +24,7 @@ logging.basicConfig(
 )
 
 # plotting parameters
+DEFAULT_FIG_HEIGHT = 5
 COLORS = ["black", "C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"]
 
 
@@ -61,12 +62,14 @@ def plot_spectrum(
         ax.set_xlim(*x_lim)
     if y_lim:
         ax.set_ylim(*y_lim)
-    ax.set_xlabel(x_lab, fontsize=16)
-    ax.set_ylabel(y_lab, fontsize=16)
+    font_ratio = fig_size[1] / DEFAULT_FIG_HEIGHT + 0.3
+    ax.set_xlabel(x_lab, fontsize=16 * font_ratio)
+    ax.set_ylabel(y_lab, fontsize=16 * font_ratio)
     for side in ["top", "right"]:
         ax.spines[side].set_visible(False)
-    ax.set_title(title, fontsize=18)
-    plt.legend(loc=legend_loc)
+    ax.set_title(title, fontsize=18 * font_ratio)
+    plt.legend(loc=legend_loc, fontsize=10 * font_ratio)
+    plt.tight_layout()
     plt.show()
 
 

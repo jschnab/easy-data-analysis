@@ -32,6 +32,7 @@ logging.basicConfig(
 )
 
 # plotting parameters
+DEFAULT_FIG_HEIGHT = 5
 EXP_COLOR = "black"
 MARKERS = ["o", "v", "^", "s", "D", "*", "P", "X", "<", ">"]
 FIT_COLOR = "grey"
@@ -83,15 +84,21 @@ def plot_kinetics(
         ax.set_xlim(*x_lim)
     if y_lim:
         ax.set_ylim(*y_lim)
-    ax.set_xlabel(x_lab, fontsize=16)
-    ax.set_ylabel(y_lab, fontsize=16)
+    font_ratio = fig_size[1] / DEFAULT_FIG_HEIGHT + 0.3
+    ax.set_xlabel(x_lab, fontsize=16 * font_ratio)
+    ax.set_ylabel(y_lab, fontsize=16 * font_ratio)
     for side in ["top", "right"]:
         ax.spines[side].set_visible(False)
     ax.set_title(title, fontsize=18)
     # remove duplicated legend
     handles, labels = plt.gca().get_legend_handles_labels()
     by_label = OrderedDict(zip(labels, handles))
-    plt.legend(by_label.values(), by_label.keys(), loc=legend_loc)
+    plt.legend(
+        by_label.values(),
+        by_label.keys(),
+        loc=legend_loc,
+        fontsize=10 * font_ratio)
+    plt.tight_layout()
     plt.show()
 
 

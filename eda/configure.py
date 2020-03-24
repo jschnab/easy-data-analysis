@@ -7,13 +7,13 @@ from shutil import copyfile
 
 transform_input = {
     "use_cols": lambda x: list(map(int, x.split())),
-    "figure_size": lambda x: list(map(int, x.split())),
+    "figure_size": lambda x: list(map(float, x.split())),
     "xcolumn": lambda x: x,
     "ycolumn": lambda x: x,
     "xlabel": lambda x: x,
     "ylabel": lambda x: x,
-    "xlimit": lambda x: list(map(int, x.split())),
-    "ylimit": lambda x: list(map(int, x.split())),
+    "xlimit": lambda x: list(map(float, x.split())),
+    "ylimit": lambda x: list(map(float, x.split())),
     "skip_header": lambda x: int(x),
     "legend_location": lambda x: x,
     "title": lambda x: x,
