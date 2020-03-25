@@ -36,6 +36,7 @@ DEFAULT_FIG_HEIGHT = 5
 EXP_COLOR = "black"
 MARKERS = ["o", "v", "^", "s", "D", "*", "P", "X", "<", ">"]
 FIT_COLOR = "grey"
+DEFAULT_MARKER_SIZE = 40
 
 
 @log_errors
@@ -64,11 +65,13 @@ def plot_kinetics(
     """
     fig, ax = plt.subplots(figsize=fig_size)
     for i, df in enumerate(input_data):
+        marker_ratio = fig_size[1] / DEFAULT_FIG_HEIGHT
         ax.scatter(
             df[x_col],
             df[y_col],
             c=EXP_COLOR,
             marker=MARKERS[i],
+            s=DEFAULT_MARKER_SIZE * marker_ratio,
             label=labels[i],
             zorder=4,
         )
@@ -85,8 +88,8 @@ def plot_kinetics(
     if y_lim:
         ax.set_ylim(*y_lim)
     font_ratio = fig_size[1] / DEFAULT_FIG_HEIGHT + 0.3
-    ax.set_xlabel(x_lab, fontsize=16 * font_ratio)
-    ax.set_ylabel(y_lab, fontsize=16 * font_ratio)
+    ax.set_xlabel(x_lab, fontsize=15 * font_ratio)
+    ax.set_ylabel(y_lab, fontsize=15 * font_ratio)
     for side in ["top", "right"]:
         ax.spines[side].set_visible(False)
     ax.set_title(title, fontsize=18)
