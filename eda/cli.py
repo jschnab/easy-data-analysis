@@ -205,8 +205,9 @@ class CliParser:
             "--fit",
             action="store_true",
             help=(
-                "Fit the data using a model, specify model with the '-f' or "
-                "'--fit' argument)"
+                "Fit the data using a model, specify a hardcorded model with "
+                "the '-m' or '--model' argument, or an arbitrary model with "
+                "the '-e' or '--expression' argument"
             ),
         )
         parser.add_argument(
