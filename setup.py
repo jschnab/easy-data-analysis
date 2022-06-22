@@ -37,7 +37,7 @@ setup(
     keywords="data analysis plotting statistics",
     install_requires=[
         "matplotlib==3.1.*",
-        "numpy==1.18.*",
+        "numpy>=1.18,<1.23",
         "pandas==0.25.*",
         "pyyaml==5.3.*",
         "scipy==1.4.*",
